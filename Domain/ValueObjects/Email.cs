@@ -1,5 +1,10 @@
 ﻿namespace SGHSS.Domain.ValueObjects
 {
+    /// <summary>
+    /// Representa um email imutável e validado.
+    /// Normaliza para minúsculas e remove espaços em branco no início/fim.
+    /// Bloqueia emails inválidos, com dois @ ou dois ".".
+    /// </summary>
     public readonly record struct Email
     {
         public string Value { get; }

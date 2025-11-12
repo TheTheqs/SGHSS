@@ -4,6 +4,11 @@ using System.Text.RegularExpressions;
 
 namespace SGHSS.Domain.ValueObjects
 {
+    /// <summary>
+    /// Representa um número de telefone válido no Brasil.
+    /// Aceita com ou sem máscara, armazenando apenas os dígitos, mas recusa explicitamente letras.
+    /// O ToString() retorna o telefone formatado com máscara.
+    /// </summary>
     public readonly record struct Phone
     {
         // Aceita formatos como:

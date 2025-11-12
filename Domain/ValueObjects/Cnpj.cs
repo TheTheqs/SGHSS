@@ -4,6 +4,11 @@ using System.Text.RegularExpressions;
 
 namespace SGHSS.Domain.ValueObjects
 {
+    /// <summary>
+    /// Representa um CNPJ (Cadastro Nacional da Pessoa Jurídica) válido no Brasil.
+    /// Aceita com ou sem máscara, armazenando apenas os dígitos sem máscara.
+    /// o ToString() retorna o CNPJ formatado com máscara.
+    /// </summary>
     public readonly record struct Cnpj
     {
         // Aceita com e sem máscara (00.000.000/0000-00)

@@ -6,9 +6,9 @@ namespace SGHSS.Domain.ValueObjects
 {
     /// <summary>
     /// Value Object para links de teleconsulta.
-    /// - Case-sensitive: preserva exatamente o case do input.
-    /// - Nunca contém host/domínio: expõe somente "path[?query][#fragment]". O domínio/host deve ser delegado ao front por flexibilização.
-    /// - Remove barras iniciais e colapsa múltiplas barras internas.
+    /// Case-sensitive: preserva exatamente o case do input.
+    /// Nunca contém host/domínio: expõe somente "path[?query][#fragment]". O domínio/host deve ser delegado ao front por flexibilização.
+    /// Remove barras iniciais e colapsa múltiplas barras internas.
     /// </summary>
     public readonly record struct Link
     {

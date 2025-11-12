@@ -3,6 +3,12 @@
 using System.Text.RegularExpressions;
 namespace SGHSS.Domain.ValueObjects
 {
+    /// <summary>
+    /// Representa um CPF (Cadastro de Pessoas Físicas) válido no Brasil.
+    /// Recebe com ou sem máscara, armazenando apenas os dígitos sem máscara.
+    /// O ToString() retorna o CPF formatado com máscara.
+    /// </summary>
+
     public readonly record struct Cpf
     {
         private static readonly Regex CpfRegex = new(@"^\d{3}\.?\d{3}\.?\d{3}-?\d{2}$", RegexOptions.Compiled);
