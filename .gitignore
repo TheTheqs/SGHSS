@@ -1,0 +1,100 @@
+## .NET / ASP.NET Core
+
+# Build e binários
+bin/
+obj/
+out/
+[Aa]rtifacts/
+*.exe
+*.dll
+*.pdb
+*.cache
+*.log
+*.vspscc
+*.vssscc
+*.user
+*.userosscache
+*.suo
+*.userprefs
+
+# Configuração de build e temporários
+*.bak
+*.swp
+*.tmp
+*.temp
+*.dbmdl
+*.dbproj.schemaview
+*.jfm
+*.tlog
+*.lastcodeanalysissucceeded
+*.VSCodeCounter
+
+# Publicação
+publish/
+*.Publish.xml
+*.pubxml
+*.publishproj
+app.publish/
+
+# ASP.NET específico
+wwwroot/*.map
+wwwroot/node_modules/
+wwwroot/lib/
+wwwroot/dist/
+wwwroot/build/
+
+# Pacotes NuGet
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+*.nuspec
+project.lock.json
+project.fragment.lock.json
+
+# Configurações locais do Visual Studio / VS Code
+.vs/
+.vscode/
+*.sln.docstates
+
+# Logs e diagnósticos
+*.stackdump
+*.dmp
+*.mdf
+*.ldf
+*.ndf
+*.log
+logs/
+TestResults/
+*.coverage
+*.coveragexml
+
+# Arquivos do Rider / JetBrains
+.idea/
+*.sln.iml
+
+# Arquivos de sistema
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+*.orig
+
+# Certificados de desenvolvimento
+*.pfx
+*.cer
+*.key
+
+# Docker
+Dockerfile.*
+docker-compose*.yml
+**/docker-compose.override.yml
+**/Dockerfile
+**/.dockerignore
+
+# Ambientes
+.env
+.env.*
+*.secret.json
+secrets.json
