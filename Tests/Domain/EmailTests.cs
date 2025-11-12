@@ -1,4 +1,4 @@
-﻿
+﻿// Tests/Domain/EmailTests.cs
 
 using Xunit;
 using SGHSS.Domain.ValueObjects;
