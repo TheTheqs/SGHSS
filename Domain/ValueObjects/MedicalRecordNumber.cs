@@ -10,7 +10,7 @@ namespace SGHSS.Domain.ValueObjects
     /// Normaliza letras para CAIXA ALTA.
     /// Valor final contém somente [A–Z0–9], tamanho entre 6 e 20, preservando zeros à esquerda.
     /// ToString() retorna o Value.
-    /// Identificação de unidade médica deve ser implementadoa em outro Value Object ou entidade.
+    /// Identificação de unidade médica deve ser implementada em outro Value Object ou entidade.
     /// </summary>
     public readonly record struct MedicalRecordNumber
     {
