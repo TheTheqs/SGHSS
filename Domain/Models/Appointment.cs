@@ -29,6 +29,7 @@ namespace SGHSS.Domain.Models
         // Relacionamentos
         public ProfessionalSchedule ProfessionalSchedule { get; set; } = null!;
         public ScheduleSlot ScheduleSlot { get; set; } = null!;
+        public MedicalRecordUpdate? MedicalRecordUpdate { get; set; }
 
         // Construtor padrão
         public Appointment() { }

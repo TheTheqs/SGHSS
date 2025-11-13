@@ -24,6 +24,7 @@ namespace SGHSS.Domain.Models
         public ICollection<HealthUnit> HealthUnits { get; set; } = new List<HealthUnit>();
         public ProfessionalSchedule ProfessionalSchedule { get; set; } = null!;
         public ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
+        public ICollection<MedicalRecordUpdate> MedicalRecordUpdates { get; set; } = new List<MedicalRecordUpdate>();
 
         //Construtor padrão
         public Professional() {}
