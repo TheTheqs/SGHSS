@@ -20,6 +20,12 @@ namespace SGHSS.Domain.Models
         public string Specialty { get; set; } = string.Empty;
         public Availability Availability { get; set; }
 
+        // Relacionamentos
+        public ICollection<HealthUnit> HealthUnits { get; set; } = new List<HealthUnit>();
+        public ProfessionalSchedule ProfessionalSchedule { get; set; } = null!;
+        public ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
+
+        //Construtor padrão
         public Professional() {}
     }
 }

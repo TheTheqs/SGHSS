@@ -6,13 +6,15 @@ using SGHSS.Domain.ValueObjects;
 namespace SGHSS.Domain.Models
 {
     /// <summary>
-    /// Represents a health unit, such as a clinic or hospital, including its identification, contact information, and
-    /// associated professionals and patients.
+    /// Representa uma unidade de saúde, como uma clínica ou hospital, incluindo sua identificação,
+    /// informações de contato e os profissionais e pacientes associados.
     /// </summary>
-    /// <remarks>A health unit typically serves as a central entity in healthcare systems, providing services
-    /// to patients and employing healthcare professionals. This class encapsulates key details about the unit,
-    /// including its unique identifier, registration information, address, and relationships to professionals and
-    /// patients.</remarks>
+    /// <remarks>
+    /// Uma unidade de saúde normalmente atua como uma entidade central em sistemas de atendimento,
+    /// oferecendo serviços a pacientes e empregando profissionais da área. Esta classe encapsula
+    /// os principais detalhes sobre a unidade, incluindo seu identificador único, dados de registro,
+    /// endereço e relacionamentos com profissionais e pacientes.
+    /// </remarks>
     public class HealthUnit
     {
         public Guid Id { get; set; }
@@ -25,6 +27,7 @@ namespace SGHSS.Domain.Models
         // Relacionamentos
         public ICollection<Professional> Professionals { get; set; } = new List<Professional>();
         public ICollection<Patient> Patients { get; set; } = new List<Patient>();
+        public ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
 
 
         // Construtor padrão
