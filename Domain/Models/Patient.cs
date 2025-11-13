@@ -23,6 +23,10 @@ namespace SGHSS.Domain.Models
         public Address Address { get; set; }
         public string? EmergencyContactName { get; set; }
 
+        // Relacionamentos
+        public ICollection<HealthUnit> HealthUnits { get; set; } = new List<HealthUnit>();
+
+        // Construtor padrão
         public Patient() { }
     }
 }

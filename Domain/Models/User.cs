@@ -24,7 +24,7 @@ namespace SGHSS.Domain.Models
         public UserStatus Status { get; set; }
 
         // Relacionamentos
-        public List<Consent> Consents { get; set; } = new List<Consent>();
+        public ICollection<Consent> Consents { get; set; } = new List<Consent>();
 
         // Construtor padrão
         public User() { }

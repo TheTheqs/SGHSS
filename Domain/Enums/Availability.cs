@@ -1,4 +1,6 @@
-﻿namespace SGHSS.Domain.Enums
+﻿// Domain/Enums/Availability.cs
+
+namespace SGHSS.Domain.Enums
 {
     public enum Availability
     {

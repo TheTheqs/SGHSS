@@ -11,6 +11,7 @@ namespace SGHSS.Domain.Models
     {
         public AccessLevel AccessLevel { get; set; }
 
+        // Construtor padrão
         public Administrator() { }
     }
 }
