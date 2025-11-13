@@ -22,5 +22,7 @@ namespace SGHSS.Domain.Models
         public Sex Sex { get; set; }
         public Address Address { get; set; }
         public string? EmergencyContactName { get; set; }
+
+        public Patient() { }
     }
 }

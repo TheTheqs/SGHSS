@@ -1,4 +1,6 @@
-﻿using SGHSS.Domain.Enums;
+﻿// Domain/Models/Professional.cs
+
+using SGHSS.Domain.Enums;
 using SGHSS.Domain.ValueObjects;
 
 namespace SGHSS.Domain.Models
@@ -17,5 +19,7 @@ namespace SGHSS.Domain.Models
         public ProfessionalLicense License { get; set; }
         public string Specialty { get; set; } = string.Empty;
         public Availability Availability { get; set; }
+
+        public Professional() {}
     }
 }
