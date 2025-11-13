@@ -1,9 +1,11 @@
-﻿namespace SGHSS.Domain.Enums
+﻿// Domain/Enums/ConsentScope.cs
+
+namespace SGHSS.Domain.Enums
 {
     public enum ConsentScope
     {
-        Tratamento,
-        Notificacao,
-        Pesquisa
+        Treatment,
+        Research,
+        Notification
     }
 }

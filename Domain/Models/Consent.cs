@@ -1,4 +1,6 @@
-﻿using SGHSS.Domain.Enums;
+﻿// Domain/Models/Consent.cs
+
+using SGHSS.Domain.Enums;
 using SGHSS.Domain.ValueObjects;
 
 namespace SGHSS.Domain.Models
@@ -34,6 +36,9 @@ namespace SGHSS.Domain.Models
         }
 
         public HashDigest TermHash { get; set; }
+
+        // Relacionamentos
+        public User User { get; set; } = null!;
 
         // Construtor padrão
         public Consent() { }

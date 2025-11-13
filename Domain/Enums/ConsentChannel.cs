@@ -1,4 +1,6 @@
-﻿namespace SGHSS.Domain.Enums
+﻿// Domain/Enums/ConsentChannel.cs
+
+namespace SGHSS.Domain.Enums
 {
     public enum ConsentChannel
     {
