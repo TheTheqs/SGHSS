@@ -25,6 +25,8 @@ namespace SGHSS.Domain.Models
         public ProfessionalSchedule ProfessionalSchedule { get; set; } = null!;
         public ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
         public ICollection<MedicalRecordUpdate> MedicalRecordUpdates { get; set; } = new List<MedicalRecordUpdate>();
+        public ICollection<EletronicPrescription> EletronicPrescriptions { get; set; } = new List<EletronicPrescription>();
+        public ICollection<DigitalMedicalCertificate> DigitalMedicalCertificates { get; set; } = new List<DigitalMedicalCertificate>();
 
         //Construtor padrão
         public Professional() {}

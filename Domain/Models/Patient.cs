@@ -26,6 +26,8 @@ namespace SGHSS.Domain.Models
         // Relacionamentos
         public ICollection<HealthUnit> HealthUnits { get; set; } = new List<HealthUnit>();
         public ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
+        public ICollection<EletronicPrescription> EletronicPrescriptions { get; set; } = new List<EletronicPrescription>();
+        public ICollection<DigitalMedicalCertificate> DigitalMedicalCertificates { get; set; } = new List<DigitalMedicalCertificate>();
 
         // Construtor padrão
         public Patient() { }

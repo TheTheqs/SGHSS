@@ -30,6 +30,8 @@ namespace SGHSS.Domain.Models
         public ProfessionalSchedule ProfessionalSchedule { get; set; } = null!;
         public ScheduleSlot ScheduleSlot { get; set; } = null!;
         public MedicalRecordUpdate? MedicalRecordUpdate { get; set; }
+        public EletronicPrescription? EletronicPrescription { get; set; }
+        public DigitalMedicalCertificate? DigitalMedicalCertificate { get; set; }
 
         // Construtor padrão
         public Appointment() { }
