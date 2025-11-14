@@ -15,8 +15,8 @@ namespace SGHSS.Domain.Models
     public class Hospitalization
     {
         public Guid Id { get; set; }
-        public DateTime AdmissionDate { get; set; }
-        public DateTime? DischargeDate { get; set; }
+        public DateTimeOffset AdmissionDate { get; set; }
+        public DateTimeOffset? DischargeDate { get; set; }
         public string Reason { get; set; } = string.Empty;
         public HospitalizationStatus Status { get; set; }
 

@@ -15,8 +15,8 @@ namespace SGHSS.Domain.Models
     public class DigitalMedicalCertificate
     {
         public Guid Id { get; set; }
-        public DateTime IssuedAt { get; set; }
-        public DateTime ValidUntil { get; set; }
+        public DateTimeOffset IssuedAt { get; set; }
+        public DateTimeOffset ValidUntil { get; set; }
         public string Recommendations { get; set; } = string.Empty;
         public IcpSignature IcpSignature { get; set; }
 

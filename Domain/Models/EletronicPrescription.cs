@@ -15,8 +15,8 @@ namespace SGHSS.Domain.Models
     public class EletronicPrescription
     {
         public Guid Id { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime ValidUntil { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
+        public DateTimeOffset ValidUntil { get; set; }
         public string Instructions { get; set; } = string.Empty;
         public IcpSignature IcpSignature { get; set; }
 
