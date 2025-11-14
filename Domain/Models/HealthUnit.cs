@@ -29,6 +29,12 @@ namespace SGHSS.Domain.Models
         public ICollection<Patient> Patients { get; set; } = new List<Patient>();
         public ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
         public ICollection<MedicalRecordUpdate> MedicalRecordUpdates { get; set; } = new List<MedicalRecordUpdate>();
+        public ICollection<EletronicPrescription> EletronicPrescriptions { get; set; } = new List<EletronicPrescription>();
+        public ICollection<DigitalMedicalCertificate> DigitalMedicalCertificates { get; set; } = new List<DigitalMedicalCertificate>();
+        public ICollection<HomeCare> HomeCares { get; set; } = new List<HomeCare>();
+        public ICollection<InventoryItem> InventoryItems { get; set; } = new List<InventoryItem>();
+        public ICollection<Bed> Beds { get; set; } = new List<Bed>();
+        public ICollection<LogActivity> LogActivities { get; set; } = new List<LogActivity>();
 
 
         // Construtor padrão

@@ -19,6 +19,7 @@ namespace SGHSS.Domain.Models
 
         // Relacionamentos
         public Hospitalization? CurrentHospitalization { get; set; }
+        public HealthUnit HealthUnit { get; set; } = null!; 
 
         // Construtor padrão
         public Bed() { }

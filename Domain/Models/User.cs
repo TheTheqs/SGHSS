@@ -25,6 +25,8 @@ namespace SGHSS.Domain.Models
 
         // Relacionamentos
         public ICollection<Consent> Consents { get; set; } = new List<Consent>();
+        public ICollection<LogActivity> LogActivities { get; set; } = new List<LogActivity>();
+        public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 
         // Construtor padrão
         public User() { }

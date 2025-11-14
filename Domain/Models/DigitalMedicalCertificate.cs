@@ -24,6 +24,7 @@ namespace SGHSS.Domain.Models
         public Appointment Appointment { get; set; } = null!;
         public Patient Patient { get; set; } = null!;
         public Professional Professional { get; set; } = null!;
+        public HealthUnit HealthUnit { get; set; } = null!;
 
         // Construtor padrão
         public DigitalMedicalCertificate() { }

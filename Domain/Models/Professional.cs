@@ -27,6 +27,8 @@ namespace SGHSS.Domain.Models
         public ICollection<MedicalRecordUpdate> MedicalRecordUpdates { get; set; } = new List<MedicalRecordUpdate>();
         public ICollection<EletronicPrescription> EletronicPrescriptions { get; set; } = new List<EletronicPrescription>();
         public ICollection<DigitalMedicalCertificate> DigitalMedicalCertificates { get; set; } = new List<DigitalMedicalCertificate>();
+        public ICollection<HomeCare> HomeCares { get; set; } = new List<HomeCare>();
+
 
         //Construtor padrão
         public Professional() {}
