@@ -15,10 +15,10 @@ namespace SGHSS.Domain.Models
     public class Notification
     {
         public Guid Id { get; set; }
-        public NotificationChannel Channel { get; set; }
+        public NotificationChannel Channel { get; set; } // Enum
         public string Message { get; set; } = null!;
         public DateTimeOffset CreatedAt { get; set; }
-        public NotificationStatus Status { get; set; }
+        public NotificationStatus Status { get; set; } // Enum
 
         // Relacionamentos
         public User Recipient { get; set; } = null!;
