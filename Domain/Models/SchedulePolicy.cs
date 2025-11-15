@@ -19,7 +19,7 @@ namespace SGHSS.Domain.Models
     {
         public Guid Id { get; set; }
         public int DurationInMinutes { get; set; }
-        public TimeZone TimeZone { get; set; }
+        public TimeZone TimeZone { get; set; } // Value Object
 
         // Relacionamentos
         public ProfessionalSchedule ProfessionalSchedule { get; set; } = null!;
