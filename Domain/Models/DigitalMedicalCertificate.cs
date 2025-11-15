@@ -18,7 +18,7 @@ namespace SGHSS.Domain.Models
         public DateTimeOffset IssuedAt { get; set; }
         public DateTimeOffset ValidUntil { get; set; }
         public string Recommendations { get; set; } = string.Empty;
-        public IcpSignature IcpSignature { get; set; }
+        public IcpSignature IcpSignature { get; set; } // Value Object
 
         // Relacionamentos
         public Appointment Appointment { get; set; } = null!;
