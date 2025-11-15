@@ -1,9 +1,17 @@
 // Program.cs for .NET 10 with Swagger/OpenAPI setup
 
+using Microsoft.EntityFrameworkCore;
+using SGHSS.Infra.Persistence;
+
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+//builder.Services.AddDbContext<SGHSSDbContext>(options =>
+//{
+//    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+//});
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true); // Configuração para compatibilidade com timestamps do PostgreSQL
 
 var app = builder.Build();
 
