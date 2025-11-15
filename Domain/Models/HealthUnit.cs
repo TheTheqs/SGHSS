@@ -19,10 +19,10 @@ namespace SGHSS.Domain.Models
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
-        public Cnpj Cnpj { get; set; }
-        public Address Address { get; set; }
-        public Phone Phone { get; set; }
-        public HealthUnitType Type { get; set; }
+        public Cnpj Cnpj { get; set; } // Value Object
+        public Address Address { get; set; } // Value Object
+        public Phone Phone { get; set; } // Value Object
+        public HealthUnitType Type { get; set; } // Enum
 
         // Relacionamentos
         public ICollection<Professional> Professionals { get; set; } = new List<Professional>();
