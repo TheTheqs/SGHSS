@@ -18,8 +18,8 @@ namespace SGHSS.Domain.Models
         public DateTimeOffset Timestamp { get; set; }
         public string Action { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        public IpAddress IpAddress { get; set; }
-        public LogResult Result { get; set; }
+        public IpAddress IpAddress { get; set; } // Value Object
+        public LogResult Result { get; set; } // Enum
 
         // Relacionamentos
         public User User { get; set; } = null!;
