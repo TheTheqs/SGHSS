@@ -17,7 +17,7 @@ namespace SGHSS.Domain.Models
         public Guid Id { get; set; }
         public DateTimeOffset MovementDate { get; set; }
         public int Quantity { get; set; }
-        public InventoryMovementType MovementType { get; set; }
+        public InventoryMovementType MovementType { get; set; } // Enum
         public string Description { get; set; } = string.Empty;
 
         // Relacionamentos
