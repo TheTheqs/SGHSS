@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿// Infra/Configurations/HealthUnitConfiguration.cs
+
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SGHSS.Domain.Models;
 using SGHSS.Domain.ValueObjects;
