@@ -18,7 +18,7 @@ namespace SGHSS.Domain.Models
         public DateTimeOffset AdmissionDate { get; set; }
         public DateTimeOffset? DischargeDate { get; set; }
         public string Reason { get; set; } = string.Empty;
-        public HospitalizationStatus Status { get; set; }
+        public HospitalizationStatus Status { get; set; } // Enum
 
         // Relacionamentos
         public Patient Patient { get; set; } = null!;
