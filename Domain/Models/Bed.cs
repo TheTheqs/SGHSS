@@ -14,8 +14,8 @@ namespace SGHSS.Domain.Models
     {
         public Guid Id { get; set; }
         public string BedNumber { get; set; } = string.Empty;
-        public BedType Type { get; set; }
-        public BedStatus Status { get; set; }
+        public BedType Type { get; set; } // Enum
+        public BedStatus Status { get; set; } // Enum
 
         // Relacionamentos
         public Hospitalization? CurrentHospitalization { get; set; }
