@@ -60,6 +60,9 @@ namespace SGHSS.Infra.Configurations
             builder.HasOne(a => a.ScheduleSlot)
                    .WithOne(ss => ss.Appointment);
 
+            builder.HasOne(a => a.Patient)
+                   .WithMany(p => p.Appointments);
+
             builder.HasOne(a => a.MedicalRecordUpdate)
                    .WithOne(mru => mru.Appointment);
 
