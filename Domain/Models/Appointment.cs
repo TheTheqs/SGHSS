@@ -19,15 +19,14 @@ namespace SGHSS.Domain.Models
     public class Appointment
     {
         public Guid Id { get; set; }
-        public DateTime StartTime { get; set; }
-        public DateTime EndTime { get; set; }
-        public AppointmentStatus Status { get; set; }
-        public AppointmentType Type { get; set; }
-        public Link? Link { get; set; }
+        public DateTimeOffset StartTime { get; set; }
+        public DateTimeOffset EndTime { get; set; }
+        public AppointmentStatus Status { get; set; } // Enum
+        public AppointmentType Type { get; set; } // Enum
+        public Link? Link { get; set; } // Value Object
         public string Description { get; set; } = string.Empty;
 
         // Relacionamentos
-        public ProfessionalSchedule ProfessionalSchedule { get; set; } = null!;
         public ScheduleSlot ScheduleSlot { get; set; } = null!;
         public MedicalRecordUpdate? MedicalRecordUpdate { get; set; }
         public EletronicPrescription? EletronicPrescription { get; set; }
