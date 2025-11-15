@@ -16,7 +16,7 @@ namespace SGHSS.Domain.Models
     public class MedicalRecord
     {
         public Guid Id { get; set; }
-        public MedicalRecordNumber Number { get; set; }
+        public MedicalRecordNumber Number { get; set; } // Value Object
         public DateTimeOffset CreatedAt { get; set; }
 
         // Relacionamentos
