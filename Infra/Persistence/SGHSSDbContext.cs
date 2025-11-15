@@ -6,13 +6,19 @@ using SGHSS.Domain.Models;
 namespace SGHSS.Infra.Persistence
 {
     /// <summary>
-    /// Represents the Entity Framework Core database context for the SGHSS application, providing access to domain
-    /// entities and database operations.
+    /// Representa o contexto de banco de dados do Entity Framework Core para a aplicação SGHSS,
+    /// fornecendo acesso às entidades de domínio e operações de persistência.
     /// </summary>
-    /// <remarks>This context manages the application's data model and is used to query and save instances of
-    /// entities such as patients, professionals, appointments, medical records, inventory items, and related healthcare
-    /// domain objects. It is typically configured and injected via dependency injection. The context applies all entity
-    /// configurations found in the assembly, enabling modular mapping and customization of the data model.</remarks>
+    /// <remarks>
+    /// Este contexto gerencia o modelo de dados da aplicação e é utilizado para consultar e salvar
+    /// instâncias de entidades como pacientes, profissionais, agendamentos, prontuários, itens de estoque
+    /// e outros objetos do domínio da saúde.  
+    /// 
+    /// Normalmente é configurado e injetado por meio de dependency injection.  
+    /// O contexto também aplica automaticamente todas as configurações de entidades encontradas no assembly,
+    /// permitindo um mapeamento modular e personalizável do modelo de dados.
+    /// </remarks>
+
     public class SGHSSDbContext : DbContext
     {
         public SGHSSDbContext(DbContextOptions<SGHSSDbContext> options)

@@ -15,7 +15,7 @@ namespace SGHSS.Domain.Models
 
     public class Administrator : User
     {
-        public AccessLevel AccessLevel { get; set; }
+        public AccessLevel AccessLevel { get; set; } // Enum
 
         // Relacionamentos
         public ICollection<InventoryMovement> InventoryMovements { get; set; } = new List<InventoryMovement>();

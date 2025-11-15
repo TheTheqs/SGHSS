@@ -7,10 +7,23 @@ using SGHSS.Domain.ValueObjects;
 
 namespace SGHSS.Infra.Configurations
 {
+    /// <summary>
+    /// Fornece a configuração do Entity Framework Core para o tipo de entidade User.
+    /// </summary>
+    /// <remarks>
+    /// Esta configuração define o mapeamento de propriedades, conversões de Value Objects,
+    /// relacionamentos e o mapeamento de herança para a entidade User.  
+    /// Deve ser registrada no model builder para garantir que a entidade User seja
+    /// corretamente mapeada para o esquema do banco de dados.
+    /// </remarks>
+
     public class UserConfiguration : IEntityTypeConfiguration<User>
     {
         public void Configure(EntityTypeBuilder<User> builder)
         {
+            // Tabela única da hierarquia
+            builder.ToTable("Users");
+
             builder.HasKey(u => u.Id);
 
             builder.Property(u => u.Name)
@@ -26,8 +39,8 @@ namespace SGHSS.Infra.Configurations
             builder.Property(u => u.Email)
                    .IsRequired()
                    .HasConversion(
-                        email => email.Value,          // VO -> string
-                        value => new Email(value))     // string -> VO
+                        email => email.Value,          
+                        value => new Email(value))
                    .HasMaxLength(254);
 
             // Phone como VO
@@ -40,16 +53,13 @@ namespace SGHSS.Infra.Configurations
 
             // Relacionamentos comuns
             builder.HasMany(u => u.Consents)
-                   .WithOne(c => c.User)
-                   .HasForeignKey(c => c.Id);
+                   .WithOne(c => c.User);
 
             builder.HasMany(u => u.LogActivities)
-                   .WithOne(l => l.User)
-                   .HasForeignKey(l => l.Id);
+                   .WithOne(l => l.User);
 
             builder.HasMany(u => u.Notifications)
-                   .WithOne(n => n.Recipient)
-                   .HasForeignKey(n => n.Id);
+                   .WithOne(n => n.Recipient);
 
             // Herança TPH (um único table Users com Discriminator)
             builder
