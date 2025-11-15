@@ -16,14 +16,13 @@ namespace SGHSS.Domain.Models
     /// </remarks>
     public class Professional : User
     {
-        public ProfessionalLicense License { get; set; }
+        public ProfessionalLicense License { get; set; } // Value Object
         public string Specialty { get; set; } = string.Empty;
-        public Availability Availability { get; set; }
+        public Availability Availability { get; set; } // Enum
 
         // Relacionamentos
         public ICollection<HealthUnit> HealthUnits { get; set; } = new List<HealthUnit>();
         public ProfessionalSchedule ProfessionalSchedule { get; set; } = null!;
-        public ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
         public ICollection<MedicalRecordUpdate> MedicalRecordUpdates { get; set; } = new List<MedicalRecordUpdate>();
         public ICollection<EletronicPrescription> EletronicPrescriptions { get; set; } = new List<EletronicPrescription>();
         public ICollection<DigitalMedicalCertificate> DigitalMedicalCertificates { get; set; } = new List<DigitalMedicalCertificate>();
