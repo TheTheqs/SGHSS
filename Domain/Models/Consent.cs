@@ -18,9 +18,9 @@ namespace SGHSS.Domain.Models
     public class Consent
     {
         public Guid Id { get; set; }
-        public ConsentScope Scope { get; set; }
+        public ConsentScope Scope { get; set; } // Enum
         public required string TermVersion { get; set; }
-        public ConsentChannel Channel { get; set; }
+        public ConsentChannel Channel { get; set; } // Enum
         public DateTimeOffset ConsentDate { get; set; }
 
         // null se nunca revogou
@@ -35,7 +35,7 @@ namespace SGHSS.Domain.Models
             }
         }
 
-        public HashDigest TermHash { get; set; }
+        public HashDigest TermHash { get; set; } // Value Object
 
         // Relacionamentos
         public User User { get; set; } = null!;
