@@ -17,6 +17,7 @@ namespace SGHSS.Domain.Models
 
         // Relacionamentos
         public Administrator CreatedBy { get; set; } = null!;
+
         // Construtor padrão
         public AuditReport() { }
     }
