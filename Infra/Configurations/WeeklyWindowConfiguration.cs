@@ -7,12 +7,13 @@ using SGHSS.Domain.Models;
 namespace SGHSS.Infra.Configurations
 {
     /// <summary>
-    /// Provides the Entity Framework Core configuration for the WeeklyWindow entity.
+    /// Fornece a configuração do Entity Framework Core para a entidade WeeklyWindow.
     /// </summary>
     /// <remarks>
-    /// Maps properties related to weekly recurring schedule windows and defines
-    /// the required relationship with SchedulePolicy.
+    /// Mapeia propriedades relacionadas a janelas semanais recorrentes
+    /// e define o relacionamento obrigatório com SchedulePolicy.
     /// </remarks>
+
     public class WeeklyWindowConfiguration : IEntityTypeConfiguration<WeeklyWindow>
     {
         public void Configure(EntityTypeBuilder<WeeklyWindow> builder)

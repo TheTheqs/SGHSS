@@ -8,13 +8,13 @@ using SGHSS.Domain.ValueObjects;
 namespace SGHSS.Infra.Configurations
 {
     /// <summary>
-    /// Fornece a configuração do Entity Framework Core para o tipo de entidade User.
+    /// Fornece a configuração do Entity Framework Core para a entidade User.
     /// </summary>
     /// <remarks>
-    /// Esta configuração define o mapeamento de propriedades, conversões de Value Objects,
-    /// relacionamentos e o mapeamento de herança para a entidade User.  
-    /// Deve ser registrada no model builder para garantir que a entidade User seja
-    /// corretamente mapeada para o esquema do banco de dados.
+    /// Define o mapeamento de propriedades, conversões de Value Objects,
+    /// relacionamentos e o mapeamento de herança.
+    /// Deve ser registrada no model builder para garantir o mapeamento correto
+    /// no esquema do banco de dados.
     /// </remarks>
 
     public class UserConfiguration : IEntityTypeConfiguration<User>

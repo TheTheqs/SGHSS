@@ -8,11 +8,11 @@ using SGHSS.Domain.ValueObjects;
 namespace SGHSS.Infra.Configurations
 {
     /// <summary>
-    /// Provides the Entity Framework Core configuration for the MedicalRecord entity.
+    /// Fornece a configuração do Entity Framework Core para a entidade MedicalRecord.
     /// </summary>
     /// <remarks>
-    /// Defines mappings for the MedicalRecord value object number, creation date,
-    /// and relationships with Patient and MedicalRecordUpdate entries.
+    /// Define o mapeamento para o Value Object Number, data de criação
+    /// e os relacionamentos com Patient e MedicalRecordUpdate.
     /// </remarks>
     public class MedicalRecordConfiguration : IEntityTypeConfiguration<MedicalRecord>
     {

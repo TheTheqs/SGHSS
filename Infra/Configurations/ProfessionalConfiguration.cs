@@ -8,12 +8,14 @@ using SGHSS.Domain.ValueObjects;
 namespace SGHSS.Infra.Configurations
 {
     /// <summary>
-    /// Provides the Entity Framework Core configuration for the Professional entity type.
+    /// Fornece a configuração do Entity Framework Core para a entidade Professional.
     /// </summary>
     /// <remarks>
-    /// Defines mappings for value objects, enums, and all relationships related to the Professional entity,
-    /// including schedule, health units, appointments, prescriptions, certificates, and medical record updates.
+    /// Define o mapeamento de Value Objects, enums e todos os relacionamentos
+    /// relacionados ao Professional, incluindo agenda, unidades de saúde,
+    /// consultas, prescrições, atestados e atualizações de prontuário.
     /// </remarks>
+
     public class ProfessionalConfiguration : IEntityTypeConfiguration<Professional>
     {
         public void Configure(EntityTypeBuilder<Professional> builder)

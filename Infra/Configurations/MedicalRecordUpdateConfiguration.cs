@@ -8,11 +8,11 @@ using SGHSS.Domain.Models;
 namespace SGHSS.Infra.Configurations
 {
     /// <summary>
-    /// Provides the Entity Framework Core configuration for the MedicalRecordUpdate entity.
+    /// Fornece a configuração do Entity Framework Core para a entidade MedicalRecordUpdate.
     /// </summary>
     /// <remarks>
-    /// Defines mappings for basic properties and relationships with MedicalRecord,
-    /// Professional, HealthUnit, and optionally Appointment.
+    /// Define o mapeamento de propriedades básicas e os relacionamentos com
+    /// MedicalRecord, Professional, HealthUnit e, opcionalmente, Appointment.
     /// </remarks>
     public class MedicalRecordUpdateConfiguration : IEntityTypeConfiguration<MedicalRecordUpdate>
     {

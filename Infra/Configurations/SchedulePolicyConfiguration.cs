@@ -8,12 +8,13 @@ using SGHSS.Domain.ValueObjects;
 namespace SGHSS.Infra.Configurations
 {
     /// <summary>
-    /// Provides the Entity Framework Core configuration for the SchedulePolicy entity.
+    /// Fornece a configuração do Entity Framework Core para a entidade SchedulePolicy.
     /// </summary>
     /// <remarks>
-    /// Maps value object fields, configures the one-to-one relationship with
-    /// ProfessionalSchedule, and the one-to-many relationship with WeeklyWindow.
+    /// Mapeia os campos do Value Object, configura o relacionamento um-para-um
+    /// com ProfessionalSchedule e o relacionamento um-para-muitos com WeeklyWindow.
     /// </remarks>
+
     public class SchedulePolicyConfiguration : IEntityTypeConfiguration<SchedulePolicy>
     {
         public void Configure(EntityTypeBuilder<SchedulePolicy> builder)

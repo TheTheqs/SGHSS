@@ -7,11 +7,11 @@ using SGHSS.Domain.Models;
 namespace SGHSS.Infra.Configurations
 {
     /// <summary>
-    /// Provides the Entity Framework Core configuration for the Notification entity.
+    /// Fornece a configuração do Entity Framework Core para a entidade Notification.
     /// </summary>
     /// <remarks>
-    /// Defines mappings for enums, text fields, timestamps, and the relationship
-    /// with the User entity representing the notification recipient.
+    /// Define o mapeamento de enums, campos textuais, timestamps
+    /// e o relacionamento com a entidade User que representa o destinatário.
     /// </remarks>
     public class NotificationConfiguration : IEntityTypeConfiguration<Notification>
     {

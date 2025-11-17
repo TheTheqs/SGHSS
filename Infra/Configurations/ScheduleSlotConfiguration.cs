@@ -8,13 +8,14 @@ using SGHSS.Domain.Models;
 namespace SGHSS.Infra.Configurations
 {
     /// <summary>
-    /// Provides the Entity Framework Core configuration for the ScheduleSlot entity.
+    /// Fornece a configuração do Entity Framework Core para a entidade ScheduleSlot.
     /// </summary>
     /// <remarks>
-    /// Defines property mappings and relationships for schedule slot intervals,
-    /// including optional appointment linkage and the required association with
-    /// the professional schedule.
+    /// Define o mapeamento de propriedades e os relacionamentos referentes aos intervalos
+    /// de agendamento, incluindo o vínculo opcional com Appointment e a associação obrigatória
+    /// com a agenda do profissional.
     /// </remarks>
+
     public class ScheduleSlotConfiguration : IEntityTypeConfiguration<ScheduleSlot>
     {
         public void Configure(EntityTypeBuilder<ScheduleSlot> builder)

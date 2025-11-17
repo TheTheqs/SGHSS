@@ -7,12 +7,13 @@ using SGHSS.Domain.Models;
 namespace SGHSS.Infra.Configurations
 {
     /// <summary>
-    /// Provides the Entity Framework Core configuration for the ProfessionalSchedule entity.
+    /// Fornece a configuração do Entity Framework Core para a entidade ProfessionalSchedule.
     /// </summary>
     /// <remarks>
-    /// Defines mappings for relationships between ProfessionalSchedule and
-    /// Professional, SchedulePolicy and ScheduleSlot entries.
+    /// Define o mapeamento dos relacionamentos entre ProfessionalSchedule,
+    /// Professional, SchedulePolicy e ScheduleSlot.
     /// </remarks>
+
     public class ProfessionalScheduleConfiguration : IEntityTypeConfiguration<ProfessionalSchedule>
     {
         public void Configure(EntityTypeBuilder<ProfessionalSchedule> builder)

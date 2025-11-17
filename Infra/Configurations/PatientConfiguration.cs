@@ -9,12 +9,13 @@ using System.Text.Json;
 namespace SGHSS.Infra.Configurations
 {
     /// <summary>
-    /// Provides the Entity Framework Core configuration for the Patient entity.
+    /// Fornece a configuração do Entity Framework Core para a entidade Patient.
     /// </summary>
     /// <remarks>
-    /// Maps specific Patient properties such as CPF, birth date, sex, address and emergency contact,
-    /// as well as its relationships with appointments, medical records, prescriptions,
-    /// certificates, hospitalizations and home care services.
+    /// Mapeia propriedades específicas como CPF, data de nascimento, sexo,
+    /// endereço e contato de emergência, além dos relacionamentos com
+    /// consultas, prontuários, prescrições, atestados, internações
+    /// e serviços de home care.
     /// </remarks>
     public class PatientConfiguration : IEntityTypeConfiguration<Patient>
     {
