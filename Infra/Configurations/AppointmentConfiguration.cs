@@ -44,11 +44,12 @@ namespace SGHSS.Infra.Configurations
                    .HasMaxLength(50)
                    .IsRequired();
 
-            // VO: Link
+            // VO: Link (nullable)
             builder.Property(a => a.Link)
                    .HasConversion(
-                        link => link!.Value,
-                        value => new Link(value.Value))
+                        link => link.HasValue ? link.Value.Value : null,
+                        value => value == null ? (Link?)null : new Link(value)
+                    )
                    .HasMaxLength(200)
                    .IsRequired(false);
 
@@ -56,21 +57,8 @@ namespace SGHSS.Infra.Configurations
                    .HasMaxLength(500);
 
             // Relacionamentos
-
-            builder.HasOne(a => a.ScheduleSlot)
-                   .WithOne(ss => ss.Appointment);
-
             builder.HasOne(a => a.Patient)
                    .WithMany(p => p.Appointments);
-
-            builder.HasOne(a => a.MedicalRecordUpdate)
-                   .WithOne(mru => mru.Appointment);
-
-            builder.HasOne(a => a.EletronicPrescription)
-                   .WithOne(ep => ep.Appointment);
-
-            builder.HasOne(a => a.DigitalMedicalCertificate)
-                   .WithOne(dmc => dmc.Appointment);
         }
     }
 }

@@ -7,10 +7,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-//builder.Services.AddDbContext<SGHSSDbContext>(options =>
-//{
-//    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
-//});
+
+// Configuração do DbContext com PostgreSQL
+builder.Services.AddDbContext<SGHSSDbContext>(options =>
+{
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
+
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true); // Configuração para compatibilidade com timestamps do PostgreSQL
 
 var app = builder.Build();

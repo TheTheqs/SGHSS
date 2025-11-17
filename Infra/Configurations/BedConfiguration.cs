@@ -39,10 +39,6 @@ namespace SGHSS.Infra.Configurations
                    .IsRequired();
 
             // Relacionamentos
-
-            builder.HasOne(b => b.CurrentHospitalization)
-                   .WithOne(h => h.Bed);
-
             builder.HasOne(b => b.HealthUnit)
                    .WithMany(hu => hu.Beds);
         }

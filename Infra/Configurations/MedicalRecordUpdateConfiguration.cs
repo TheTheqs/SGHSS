@@ -42,7 +42,7 @@ namespace SGHSS.Infra.Configurations
 
             builder.HasOne(mru => mru.Appointment)
                    .WithOne(a => a.MedicalRecordUpdate)
-                   .IsRequired(false);
+                   .HasForeignKey<MedicalRecordUpdate>("AppointmentId");
         }
     }
 }

@@ -40,7 +40,8 @@ namespace SGHSS.Infra.Configurations
                    .WithMany(p => p.Hospitalizations);
 
             builder.HasOne(h => h.Bed)
-                   .WithOne(b => b.CurrentHospitalization);
+                   .WithOne(b => b.CurrentHospitalization)
+                   .HasForeignKey<Bed>("AppointmentId");
         }
     }
 }

@@ -43,9 +43,6 @@ namespace SGHSS.Infra.Configurations
             builder.HasMany(p => p.HealthUnits)
                    .WithMany(hu => hu.Professionals);
 
-            builder.HasOne(p => p.ProfessionalSchedule)
-                   .WithOne(ps => ps.Professional);
-
             builder.HasMany(p => p.MedicalRecordUpdates)
                    .WithOne(mru => mru.Professional);
 

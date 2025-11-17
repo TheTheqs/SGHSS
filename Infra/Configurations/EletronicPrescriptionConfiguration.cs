@@ -45,7 +45,8 @@ namespace SGHSS.Infra.Configurations
             // Relacionamentos
 
             builder.HasOne(ep => ep.Appointment)
-                   .WithOne(a => a.EletronicPrescription);
+                   .WithOne(a => a.EletronicPrescription)
+                   .HasForeignKey<EletronicPrescription>("AppointmentId");
 
             builder.HasOne(ep => ep.Patient)
                    .WithMany(p => p.EletronicPrescriptions);

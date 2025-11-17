@@ -57,10 +57,6 @@ namespace SGHSS.Infra.Configurations
             builder.HasMany(p => p.Appointments)
                    .WithOne(a => a.Patient);
 
-            builder.HasOne(p => p.MedicalRecord)
-                   .WithOne(mr => mr.Patient)
-                   .IsRequired();
-
             builder.HasMany(p => p.EletronicPrescriptions)
                    .WithOne(ep => ep.Patient);
 

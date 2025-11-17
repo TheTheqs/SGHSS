@@ -43,7 +43,8 @@ namespace SGHSS.Infra.Configurations
 
             builder.HasOne(ss => ss.Appointment)
                    .WithOne(a => a.ScheduleSlot)
-                   .IsRequired(false);
+                   .IsRequired(false)
+                   .HasForeignKey<ScheduleSlot>("AppointmentId");
         }
     }
 }

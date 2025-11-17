@@ -25,7 +25,8 @@ namespace SGHSS.Infra.Configurations
             // Relacionamentos
 
             builder.HasOne(ps => ps.Professional)
-                   .WithOne(p => p.ProfessionalSchedule);
+                   .WithOne(p => p.ProfessionalSchedule)
+                   .HasForeignKey<ProfessionalSchedule>("ProfessionalId");
 
             builder.HasOne(ps => ps.SchedulePolicy)
                    .WithOne(sp => sp.ProfessionalSchedule);

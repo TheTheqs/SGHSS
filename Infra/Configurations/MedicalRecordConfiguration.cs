@@ -35,9 +35,9 @@ namespace SGHSS.Infra.Configurations
 
             // RELACIONAMENTOS
             builder.HasOne(mr => mr.Patient)
-                   .WithOne(p => p.MedicalRecord);
+                   .WithOne(p => p.MedicalRecord)
+                   .HasForeignKey<MedicalRecord>("PatientId");
 
-            // 1 : N → MedicalRecordUpdate
             builder.HasMany(mr => mr.Updates)
                    .WithOne(u => u.MedicalRecord);
         }

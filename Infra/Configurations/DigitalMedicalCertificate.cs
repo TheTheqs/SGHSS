@@ -45,7 +45,8 @@ namespace SGHSS.Infra.Configurations
             // Relacionamentos
 
             builder.HasOne(d => d.Appointment)
-                   .WithOne(a => a.DigitalMedicalCertificate);
+                   .WithOne(a => a.DigitalMedicalCertificate)
+                   .HasForeignKey<DigitalMedicalCertificate>("AppointmentId");
 
             builder.HasOne(d => d.Patient)
                    .WithMany(p => p.DigitalMedicalCertificates);
