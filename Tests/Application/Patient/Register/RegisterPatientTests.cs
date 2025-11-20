@@ -6,7 +6,11 @@ using SGHSS.Application.UseCases.Common;
 using SGHSS.Application.UseCases.Patients.Register;
 using SGHSS.Domain.Enums;
 using SGHSS.Domain.ValueObjects;
-using SGHSS.Tests.Application.UseCases.Patients.Register;
+using SGHSS.Infra.Repositories;
+using SGHSS.Tests.Infra;
+using SGHSS.Tests.TestData.Common;
+using SGHSS.Tests.TestData.Models.SGHSS.Tests.TestData.Common;
+using SGHSS.Tests.TestData.Models.SGHSS.Tests.TestData.Patients;
 using Xunit;
 
 namespace SGHSS.Tests.Application.Patient.Register
@@ -18,27 +22,19 @@ namespace SGHSS.Tests.Application.Patient.Register
         public async Task Deve_Salvar_Novo_Paciente()
         {
             // Arrange
-            RegisterPatientRequest _example = new RegisterPatientRequest
-            {
-                Name = "Ana Souza",
-                Email = "ana_email@email.com",
-                Phone = "19989256478",
-                Cpf = "197.396.915-79",
-                BirthDate = new DateTimeOffset(1990, 5, 20, 0, 0, 0, TimeSpan.Zero),
-                Sex = Sex.Female,
-                Address = new AddressDto
-                {
-                    Street = "Rua das Flores",
-                    Number = "100",
-                    City = "São Paulo",
-                    State = "SP",
-                    Cep = "01001000",
-                    District = "Centro",
-                    Complement = null
-                },
-                EmergencyContactName = "Gervásio Sousa",
-            };
-            var repo = new FakePatientRepository();
+            RegisterPatientRequest _example = PatientGenerator.GeneratePatient();
+            ConsentDto treatmentConsent = ConsentGenerator.GenerateConsent(ConsentScope.Treatment, ConsentChannel.Web, true);
+            ConsentDto researchConsent = ConsentGenerator.GenerateConsent(ConsentScope.Research, ConsentChannel.Web, true);
+            ConsentDto notificationConsent = ConsentGenerator.GenerateConsent(ConsentScope.Notification, ConsentChannel.Web, true);
+            _example.Consents.Add(treatmentConsent);
+            _example.Consents.Add(researchConsent);
+            _example.Consents.Add(notificationConsent);
+
+            // In memory database
+            using var context = DbContextTestFactory.CreateInMemoryContext();
+            var repo = new PatientRepository(context);
+
+            // Act
             var useCase = new RegisterPatientUseCase(repo);
             var request = _example;        
             var result = await useCase.Handle(request);
@@ -50,66 +46,170 @@ namespace SGHSS.Tests.Application.Patient.Register
         }
 
         [Fact]
-        public async Task Deve_Rejeitar_Cpf_Duplicado()
+        public async Task Deve_Recusar_Novo_Paciente_Menor_de_Idade()
         {
             // Arrange
-            RegisterPatientRequest _example = new RegisterPatientRequest
-            {
-                Name = "Ana Souza",
-                Email = "ana_email@email.com",
-                Phone = "19989256478",
-                Cpf = "41019075953",
-                BirthDate = new DateTimeOffset(1990, 5, 20, 0, 0, 0, TimeSpan.Zero),
-                Sex = Sex.Female,
-                Address = new AddressDto
-                {
-                    Street = "Rua das Flores",
-                    Number = "100",
-                    City = "São Paulo",
-                    State = "SP",
-                    Cep = "01001000",
-                    District = "Centro",
-                    Complement = null
-                },
-                EmergencyContactName = "Gervásio Sousa",
-            };
-            var repo = new FakePatientRepository();
+            RegisterPatientRequest _example = PatientGenerator.GeneratePatient(isUnderage: true);
+            ConsentDto treatmentConsent = ConsentGenerator.GenerateConsent(ConsentScope.Treatment, ConsentChannel.Web, true);
+            ConsentDto researchConsent = ConsentGenerator.GenerateConsent(ConsentScope.Research, ConsentChannel.Web, true);
+            ConsentDto notificationConsent = ConsentGenerator.GenerateConsent(ConsentScope.Notification, ConsentChannel.Web, true);
+            _example.Consents.Add(treatmentConsent);
+            _example.Consents.Add(researchConsent);
+            _example.Consents.Add(notificationConsent);
+
+            // In memory database
+            using var context = DbContextTestFactory.CreateInMemoryContext();
+            var repo = new PatientRepository(context);
+
+            // Act
             var useCase = new RegisterPatientUseCase(repo);
             var request = _example;
             Func<Task> act = () => useCase.Handle(request);
+
+            // Assert
             await act.Should()
                 .ThrowAsync<InvalidOperationException>()
-                .WithMessage("Já existe um paciente cadastrado com o CPF informado.");
+                .WithMessage("O paciente deve ser maior de idade.");
+
+            var exists = await repo.ExistsByCpfAsync(new Cpf(request.Cpf));
+            exists.Should().BeFalse();
+
         }
 
         [Fact]
-        public async Task Deve_Rejeitar_email_Duplicado()
+        public async Task Deve_recusar_paciente_sem_consentimentos()
         {
             // Arrange
-            RegisterPatientRequest _example = new RegisterPatientRequest
-            {
-                Name = "Ana Souza",
-                Email = "maria@example.com",
-                Phone = "19989256478",
-                Cpf = "197.396.915-79",
-                BirthDate = new DateTimeOffset(1990, 5, 20, 0, 0, 0, TimeSpan.Zero),
-                Sex = Sex.Female,
-                Address = new AddressDto
-                {
-                    Street = "Rua das Flores",
-                    Number = "100",
-                    City = "São Paulo",
-                    State = "SP",
-                    Cep = "01001000",
-                    District = "Centro",
-                    Complement = null
-                },
-                EmergencyContactName = "Gervásio Sousa",
-            };
-            var repo = new FakePatientRepository();
+            RegisterPatientRequest _example = PatientGenerator.GeneratePatient();
+
+            // In memory database
+            using var context = DbContextTestFactory.CreateInMemoryContext();
+            var repo = new PatientRepository(context);
+
+            // Act
             var useCase = new RegisterPatientUseCase(repo);
             var request = _example;
             Func<Task> act = () => useCase.Handle(request);
+
+            // Assert
+            await act.Should()
+                .ThrowAsync<InvalidOperationException>()
+                .WithMessage("É obrigatório informar ao menos um consentimento.");
+
+            var exists = await repo.ExistsByCpfAsync(new Cpf(request.Cpf));
+            exists.Should().BeFalse();
+        }
+
+        [Fact]
+        public async Task Deve_recusar_paciente_sem_consentimento_de_tratamento()
+        {
+            // Arrange
+            RegisterPatientRequest _example = PatientGenerator.GeneratePatient();
+            ConsentDto researchConsent = ConsentGenerator.GenerateConsent(ConsentScope.Research, ConsentChannel.Web, true);
+            ConsentDto notificationConsent = ConsentGenerator.GenerateConsent(ConsentScope.Notification, ConsentChannel.Web, true);
+            _example.Consents.Add(researchConsent);
+            _example.Consents.Add(notificationConsent);
+
+            // In memory database
+            using var context = DbContextTestFactory.CreateInMemoryContext();
+            var repo = new PatientRepository(context);
+
+            // Act
+            var useCase = new RegisterPatientUseCase(repo);
+            var request = _example;
+            Func<Task> act = () => useCase.Handle(request);
+
+            // Assert
+            await act.Should()
+                .ThrowAsync<InvalidOperationException>()
+                .WithMessage("O paciente não possui um consentimento de tratamento ativo.");
+
+            var exists = await repo.ExistsByCpfAsync(new Cpf(request.Cpf));
+            exists.Should().BeFalse();
+        }
+
+        [Fact]
+        public async Task Deve_Recusar_cpf_duplicado()
+        {
+            // Arrange
+            RegisterPatientRequest _example = PatientGenerator.GeneratePatient();
+            ConsentDto treatmentConsent = ConsentGenerator.GenerateConsent(ConsentScope.Treatment, ConsentChannel.Web, true);
+            ConsentDto researchConsent = ConsentGenerator.GenerateConsent(ConsentScope.Research, ConsentChannel.Web, true);
+            ConsentDto notificationConsent = ConsentGenerator.GenerateConsent(ConsentScope.Notification, ConsentChannel.Web, true);
+            _example.Consents.Add(treatmentConsent);
+            _example.Consents.Add(researchConsent);
+            _example.Consents.Add(notificationConsent);
+
+            RegisterPatientRequest _example2 = PatientGenerator.GeneratePatient(providedCpf: _example.Cpf);
+            ConsentDto treatmentConsent2 = ConsentGenerator.GenerateConsent(ConsentScope.Treatment, ConsentChannel.Web, true);
+            ConsentDto researchConsent2 = ConsentGenerator.GenerateConsent(ConsentScope.Research, ConsentChannel.Web, true);
+            ConsentDto notificationConsent2 = ConsentGenerator.GenerateConsent(ConsentScope.Notification, ConsentChannel.Web, true);
+            _example.Consents.Add(treatmentConsent2);
+            _example.Consents.Add(researchConsent2);
+            _example.Consents.Add(notificationConsent2);
+
+            // In memory database
+            using var context = DbContextTestFactory.CreateInMemoryContext();
+            var repo = new PatientRepository(context);
+
+            // Act 1
+            var useCase = new RegisterPatientUseCase(repo);
+            var request = _example;
+            var result = await useCase.Handle(request);
+            var consult = await repo.ExistsByCpfAsync(new Cpf(request.Cpf));
+            result.Should().NotBeNull();
+            result.PatientId.Should().NotBe(Guid.Empty);
+            consult.Should().BeTrue();
+
+            // Act 2
+            var request2 = _example2;
+            Func<Task> act = () => useCase.Handle(request2);
+
+            // Assert
+            await act.Should()
+                .ThrowAsync<InvalidOperationException>()
+                .WithMessage("Já existe um paciente cadastrado com o CPF informado.");
+
+        }
+
+        [Fact]
+        public async Task Deve_Recusar_email_duplicado()
+        {
+            // Arrange
+            RegisterPatientRequest _example = PatientGenerator.GeneratePatient();
+            ConsentDto treatmentConsent = ConsentGenerator.GenerateConsent(ConsentScope.Treatment, ConsentChannel.Web, true);
+            ConsentDto researchConsent = ConsentGenerator.GenerateConsent(ConsentScope.Research, ConsentChannel.Web, true);
+            ConsentDto notificationConsent = ConsentGenerator.GenerateConsent(ConsentScope.Notification, ConsentChannel.Web, true);
+            _example.Consents.Add(treatmentConsent);
+            _example.Consents.Add(researchConsent);
+            _example.Consents.Add(notificationConsent);
+
+            RegisterPatientRequest _example2 = PatientGenerator.GeneratePatient(providedEmail: _example.Email);
+            ConsentDto treatmentConsent2 = ConsentGenerator.GenerateConsent(ConsentScope.Treatment, ConsentChannel.Web, true);
+            ConsentDto researchConsent2 = ConsentGenerator.GenerateConsent(ConsentScope.Research, ConsentChannel.Web, true);
+            ConsentDto notificationConsent2 = ConsentGenerator.GenerateConsent(ConsentScope.Notification, ConsentChannel.Web, true);
+            _example.Consents.Add(treatmentConsent2);
+            _example.Consents.Add(researchConsent2);
+            _example.Consents.Add(notificationConsent2);
+
+            // In memory database
+            using var context = DbContextTestFactory.CreateInMemoryContext();
+            var repo = new PatientRepository(context);
+
+            // Act 1
+            var useCase = new RegisterPatientUseCase(repo);
+            var request = _example;
+            var result = await useCase.Handle(request);
+            var consult = await repo.ExistsByCpfAsync(new Cpf(request.Cpf));
+            result.Should().NotBeNull();
+            result.PatientId.Should().NotBe(Guid.Empty);
+            consult.Should().BeTrue();
+
+            // Act 2
+            var request2 = _example2;
+            Func<Task> act = () => useCase.Handle(request2);
+
+            // Assert
             await act.Should()
                 .ThrowAsync<InvalidOperationException>()
                 .WithMessage("Já existe um paciente cadastrado com o Email informado.");

@@ -1,10 +1,10 @@
 ﻿// Application/UseCases/Patients/Register/RegisterPatientUseCase.cs
 
 using SGHSS.Application.Interfaces.Repositories;
-using SGHSS.Application.UseCases.Common;
+using SGHSS.Application.Mappers;
+using SGHSS.Domain.Enums;
 using SGHSS.Domain.Models;
 using SGHSS.Domain.ValueObjects;
-using System.Threading;
 
 namespace SGHSS.Application.UseCases.Patients.Register
 {
@@ -38,10 +38,14 @@ namespace SGHSS.Application.UseCases.Patients.Register
         /// <exception cref="InvalidOperationException">
         /// Lançada quando já existe um paciente cadastrado com o CPF informado.
         /// </exception>
-        public async Task<RegisterPatientResponse> Handle(
-            RegisterPatientRequest request,
-            CancellationToken cancellationToken = default)
+        public async Task<RegisterPatientResponse> Handle(RegisterPatientRequest request)
         {
+            // Regra de negócio: paciente deve ser maior de idade
+            if (!IsAdult(request.BirthDate))
+            {
+                throw new InvalidOperationException("O paciente deve ser maior de idade.");
+            }
+
             // Conversão dos dados do DTO para Value Objects de domínio
             var email = new Email(request.Email);
             var phone = new Phone(request.Phone);
@@ -64,7 +68,7 @@ namespace SGHSS.Application.UseCases.Patients.Register
             }
 
 
-            Address address = MapAddress(request.Address);
+            Address address = AddressMapper.ToDomain(request.Address);
 
             // Construção da entidade de domínio Patient
             var patient = new Patient
@@ -78,35 +82,55 @@ namespace SGHSS.Application.UseCases.Patients.Register
                 Sex = request.Sex,
                 Address = address,
                 EmergencyContactName = request.EmergencyContactName
-                // Status, MedicalRecord e relacionamentos adicionais
-                // podem ser tratados em outros fluxos/casos de uso.
             };
 
+            // Garante que veio ao menos um consent
+            if (request.Consents is null || !request.Consents.Any())
+            {
+                throw new InvalidOperationException("É obrigatório informar ao menos um consentimento.");
+            }
+
+            // Associação dos consentimentos fornecidos ao paciente
+            foreach (var dto in request.Consents)
+            {
+                var consent = ConsentMapper.ToDomain(dto);
+                patient.Consents.Add(consent);
+            }
+
+            // Usa o método do model para validar consentimento ativo
+            var treatmentConsent = patient.GetActiveConsent(ConsentScope.Treatment);
+
+            if (treatmentConsent is null)
+            {
+                throw new InvalidOperationException(
+                    "O paciente não possui um consentimento de tratamento ativo."
+                );
+            }
+
             // Persistência (somente adiciona ao repositório; o commit/SaveChanges
-            // Tratado Futuramente com UnitOfWork ou similar)
+            // Tratado Futuramente com UnitOfWork
             await _patientRepository.AddAsync(patient);
 
             return new RegisterPatientResponse(patient.Id);
         }
 
         /// <summary>
-        /// Mapeia o <see cref="AddressDto"/> recebido pela camada de interface
-        /// para o Value Object <see cref="Address"/> do domínio.
+        /// Determina se a data de nascimento corresponde a um adulto (18+).
         /// </summary>
-        /// <param name="dto">DTO contendo os dados de endereço.</param>
-        /// <returns>Instância de <see cref="Address"/> construída a partir do DTO.</returns>
-        private static Address MapAddress(AddressDto dto)
+        private static bool IsAdult(DateTimeOffset birthDate)
         {
-            return new Address(
-                street: dto.Street,
-                number: dto.Number,
-                city: dto.City,
-                state: dto.State,
-                cep: dto.Cep,
-                district: dto.District,
-                complement: dto.Complement,
-                country: dto.Country
-            );
+            var today = DateTimeOffset.UtcNow.Date;
+            var birth = birthDate.Date;
+
+            int age = today.Year - birth.Year;
+
+            // Se ainda não fez aniversário neste ano, decrementa
+            if (birth > today.AddYears(-age))
+            {
+                age--;
+            }
+
+            return age >= 18;
         }
     }
 }

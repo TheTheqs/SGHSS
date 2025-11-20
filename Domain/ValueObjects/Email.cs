@@ -15,7 +15,7 @@
             var normalized = input.Trim().ToLowerInvariant();
             if (normalized.Any(char.IsWhiteSpace))
                 throw new ArgumentException("Email inválido.", nameof(input));
-            if (normalized.Count(c => c == '@') != 1 || normalized.Count(c => c == '.') != 1)
+            if (normalized.Count(c => c == '@') != 1 || normalized.Count(c => c == '.') > 2)
                 throw new ArgumentException("Email inválido.", nameof(input));
 
             var atIndex = normalized.IndexOf('@');

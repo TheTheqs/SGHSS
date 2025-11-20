@@ -56,8 +56,9 @@ namespace SGHSS.Application.UseCases.Patients.Register
         public string? EmergencyContactName { get; init; }
 
         /// <summary>
-        /// Identificador opcional da unidade de saúde principal associada ao paciente.
+        /// Gets the consent information associated with the current context.
         /// </summary>
-        public Guid? PrimaryHealthUnitId { get; init; }
+        public ICollection<ConsentDto> Consents { get; init; } = new List<ConsentDto>();
+
     }
 }

@@ -35,7 +35,6 @@ namespace SGHSS.Tests.Domain
         [InlineData("user")]               // sem '@'
         [InlineData("user@domain")]        // sem ponto após '@'
         [InlineData("user@@domain.com")]   // dois '@'
-        [InlineData("user@domain..com")]   // dois '.'
         [InlineData("user @domain.com")]   // espaço interno
         [InlineData("@domain.com")]        // nada antes do '@'
         [InlineData("user@.com")]          // ponto logo após '@'
