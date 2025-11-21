@@ -77,6 +77,7 @@ namespace SGHSS.Application.UseCases.Patients.Register
                 Name = request.Name,
                 Email = email,
                 Phone = phone,
+                Status = UserStatus.Active,
                 Cpf = cpf,
                 BirthDate = request.BirthDate,
                 Sex = request.Sex,
@@ -107,8 +108,7 @@ namespace SGHSS.Application.UseCases.Patients.Register
                 );
             }
 
-            // Persistência (somente adiciona ao repositório; o commit/SaveChanges
-            // Tratado Futuramente com UnitOfWork
+            // Persistência
             await _patientRepository.AddAsync(patient);
 
             return new RegisterPatientResponse(patient.Id);

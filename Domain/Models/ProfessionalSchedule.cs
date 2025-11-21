@@ -18,6 +18,8 @@ namespace SGHSS.Domain.Models
         // Relacionamentos
         public Professional Professional { get; set; } = null!;
         public SchedulePolicy SchedulePolicy { get; set; } = null!;
+
+        // Gerãdo em tempo de execução, durante agendamento de consulta.
         public ICollection<ScheduleSlot> ScheduleSlots { get; set; } = new List<ScheduleSlot>();
 
         // Construtor padrão
