@@ -56,7 +56,7 @@ namespace SGHSS.Application.UseCases.Patients.Register
         public string? EmergencyContactName { get; init; }
 
         /// <summary>
-        /// Gets the consent information associated with the current context.
+        /// Consentimentos associados ao paciente.
         /// </summary>
         public ICollection<ConsentDto> Consents { get; init; } = new List<ConsentDto>();
 
