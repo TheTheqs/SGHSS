@@ -1,5 +1,6 @@
 ﻿// Application/Interfaces/Repositories/IHealthUnitRepository.cs
 
+using SGHSS.Domain.Models;
 using SGHSS.Domain.ValueObjects;
 
 namespace SGHSS.Application.Interfaces.Repositories
@@ -26,5 +27,26 @@ namespace SGHSS.Application.Interfaces.Repositories
         /// </summary>
         /// <param name="healthUnit">A entidade de unidade de saúde a ser salva.</param>
         Task AddAsync(Domain.Models.HealthUnit healthUnit);
+
+        /// <summary>
+        /// Recupera uma unidade de saúde pelo seu identificador único.
+        /// </summary>
+        /// <param name="healthUnitId">O identificador da unidade de saúde.</param>
+        /// <returns>
+        /// A entidade <see cref="HealthUnit"/> correspondente ao identificador,
+        /// ou <c>null</c> caso nenhuma unidade seja encontrada.
+        /// </returns>
+        Task<HealthUnit?> GetByIdAsync(Guid healthUnitId);
+
+        /// <summary>
+        /// Atualiza uma unidade de saúde existente no repositório,
+        /// persistindo alterações em sua lista de leitos ou demais propriedades.
+        /// </summary>
+        /// <param name="healthUnit">A instância atualizada da entidade a ser persistida.</param>
+        Task UpdateAsync(HealthUnit healthUnit);
+
+
+
+
     }
 }

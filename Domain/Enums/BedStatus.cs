@@ -6,7 +6,6 @@ namespace SGHSS.Domain.Enums
     {
         Available,
         Occupied,
-        UnderMaintenance,
-        Reserved
+        UnderMaintenance
     }
 }
