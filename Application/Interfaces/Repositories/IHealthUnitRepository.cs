@@ -26,7 +26,7 @@ namespace SGHSS.Application.Interfaces.Repositories
         /// Persiste uma nova unidade de saúde no repositório.
         /// </summary>
         /// <param name="healthUnit">A entidade de unidade de saúde a ser salva.</param>
-        Task AddAsync(Domain.Models.HealthUnit healthUnit);
+        Task AddAsync(HealthUnit healthUnit);
 
         /// <summary>
         /// Recupera uma unidade de saúde pelo seu identificador único.

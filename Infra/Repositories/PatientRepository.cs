@@ -30,6 +30,25 @@ namespace SGHSS.Infra.Repositories
         }
 
         /// <summary>
+        /// Recupera um paciente seu identificador único,
+        /// incluindo suas listas e relacionamentos relevantes
+        /// </summary>
+        /// <param name="patientId">Identificador do paciente.</param>
+        /// <returns>
+        /// A entidade <see cref="Patient"/> correspondente ao identificador,
+        /// ou <c>null</c> caso não seja encontrada.
+        /// </returns>
+        /// <remarks>
+        /// Inclui o carregamento explícito de seus relacionamentos.
+        /// </remarks>
+        public async Task<Patient?> GetByIdAsync(Guid patientId)
+        {
+            return await _context.Patients
+                .Include(p => p.Hospitalizations)
+                .FirstOrDefaultAsync(p => p.Id == patientId);
+        }
+
+        /// <summary>
         /// Verifica de forma assíncrona se já existe um paciente cadastrado com o CPF informado.
         /// </summary>
         /// <param name="cpf">CPF do paciente encapsulado em um Value Object.</param>
@@ -53,6 +72,20 @@ namespace SGHSS.Infra.Repositories
         {
             return await _context.Patients
                 .AnyAsync(p => p.Email == email);
+        }
+
+        /// <summary>
+        /// Atualiza os dados do paciente no banco de dados.
+        /// </summary>
+        /// <param name="patient">Entidade <see cref="Patient"/> que será atualizada.</param>
+        /// <remarks>
+        /// O Entity Framework rastreia a entidade e salva todas as mudanças
+        /// realizadas, incluindo alterações em agregados relacionados.
+        /// </remarks>
+        public async Task UpdateAsync(Patient patient)
+        {
+          _context.Patients.Update(patient);
+          await _context.SaveChangesAsync();
         }
 
         /// <summary>

@@ -108,6 +108,10 @@ namespace SGHSS.Application.UseCases.Patients.Register
                 );
             }
 
+            // Criação do prontuário novo para o paciente
+            var medicalRecord = CreateEmptyMedicalRecordFor(patient);
+            patient.MedicalRecord = medicalRecord;
+
             // Persistência
             await _patientRepository.AddAsync(patient);
 
@@ -131,6 +135,47 @@ namespace SGHSS.Application.UseCases.Patients.Register
             }
 
             return age >= 18;
+        }
+        /// <summary>
+        /// Cria um prontuário "virgem" para o paciente, gerando um MRN válido.
+        /// </summary>
+        private static MedicalRecord CreateEmptyMedicalRecordFor(Patient patient)
+        {
+            var mrnString = GenerateMedicalRecordNumber();
+            var mrn = new MedicalRecordNumber(mrnString);
+
+            return new MedicalRecord
+            {
+                Id = Guid.NewGuid(),
+                Number = mrn,
+                CreatedAt = DateTimeOffset.UtcNow,
+                Patient = patient
+            };
+        }
+
+        /// <summary>
+        /// Gera um número de prontuário válido segundo as regras de <see cref="MedicalRecordNumber"/>.
+        /// </summary>
+        /// <remarks>
+        /// Usa um GUID como base, garantindo apenas A–F e 0–9, tamanho dentro da faixa
+        /// e rejeitando o caso extremo de todos os caracteres iguais.
+        /// </remarks>
+        private static string GenerateMedicalRecordNumber()
+        {
+            while (true)
+            {
+                // 32 chars A–F0–9
+                string raw = Guid.NewGuid().ToString("N").ToUpperInvariant();
+
+                // recorta para algo entre 6 e 20, ex.: 12
+                string candidate = raw[..12];
+
+                // Proteção extra: evita todos iguais (regra do VO)
+                if (!candidate.All(c => c == candidate[0]))
+                {
+                    return candidate;
+                }
+            }
         }
     }
 }

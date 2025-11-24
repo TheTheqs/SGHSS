@@ -25,13 +25,48 @@ namespace SGHSS.Application.Interfaces.Repositories
         Task<bool> ExistsByCpfAsync(Cpf cpf);
 
         /// <summary>
+        /// Recupera um paciente seu identificador único,
+        /// incluindo suas listas e relacionamentos relevantes
+        /// </summary>
+        /// <param name="patientId">Identificador do paciente.</param>
+        /// <returns>
+        /// A entidade <see cref="Patient"/> correspondente ao identificador,
+        /// ou <c>null</c> caso não seja encontrada.
+        /// </returns>
+        /// <remarks>
+        /// Inclui o carregamento explícito de seus relacionamentos.
+        /// </remarks>
+        Task<Patient?> GetByIdAsync(Guid patientId);
+
+        /// <summary>
         /// Determina de forma assíncrona se existe um usuário com o endereço de e-mail especificado.
         /// </summary>
         /// <param name="email">O endereço de e-mail a ser verificado. Não pode ser nulo.</param>
         /// <returns>Uma tarefa que representa a operação assíncrona. O resultado da tarefa contém
         /// <see langword="true"/> se existir um usuário com o e-mail especificado; caso contrário,
         /// <see langword="false"/>.</returns>
-        Task<bool> ExistsByEmailAsync(Email email)   ;
+        Task<bool> ExistsByEmailAsync(Email email);
+
+        /// <summary>
+        /// Atualiza o registro de um paciente na base de dados, incluindo suas
+        /// propriedades diretas e quaisquer entidades agregadas, como internações
+        /// (<see cref="Hospitalization"/>) e prontuário médico.
+        /// </summary>
+        /// <param name="patient">
+        /// Instância atualizada da entidade <see cref="Patient"/> que será persistida.
+        /// Esta instância deve refletir o estado atual desejado do paciente e de seus
+        /// relacionamentos carregados.
+        /// </param>
+        /// <returns>
+        /// Uma tarefa assíncrona que representa a operação de atualização.
+        /// </returns>
+        /// <remarks>
+        /// Este método utiliza o rastreamento de alterações do Entity Framework Core.
+        /// Caso o paciente ou seus agregados já estejam sendo rastreados pelo contexto,
+        /// o EF detectará automaticamente as modificações e aplicará as mudanças durante
+        /// a chamada ao método de persistência.
+        /// </remarks>
+        Task UpdateAsync(Patient patient);
 
         /// <summary>
         /// Adiciona um novo paciente ao repositório.
