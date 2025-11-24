@@ -4,7 +4,6 @@ namespace SGHSS.Domain.Enums
 {
     public enum AppointmentStatus
     {
-        Pending,
         Confirmed,
         Denied,
         Canceled,
