@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿// Infra/Repositories/DigitalMedicalCertificateRepository
+
 using SGHSS.Application.Interfaces.Repositories;
 using SGHSS.Domain.Models;
 using SGHSS.Infra.Persistence;

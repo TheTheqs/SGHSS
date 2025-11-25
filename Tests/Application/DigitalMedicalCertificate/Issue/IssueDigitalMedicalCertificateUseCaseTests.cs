@@ -1,4 +1,6 @@
-﻿using FluentAssertions;
+﻿// Tests/Application/DigitalMedicalCertificate/Issue/IssueDigitalMedicalCertificateUseCaseTests.cs
+
+using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using SGHSS.Application.Interfaces.Repositories;
 using SGHSS.Application.UseCases.Administrators.Register;
