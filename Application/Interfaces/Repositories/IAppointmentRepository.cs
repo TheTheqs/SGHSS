@@ -14,5 +14,15 @@ namespace SGHSS.Application.Interfaces.Repositories
         /// </summary>
         /// <param name="appointment">Consulta a ser salva.</param>
         Task AddAsync(Appointment appointment);
+
+        /// <summary>
+        /// Recupera uma consulta (appointment) pelo seu identificador único.
+        /// </summary>
+        /// <param name="appointmentId">Identificador da consulta a ser localizada.</param>
+        /// <returns>
+        /// A entidade <see cref="Appointment"/> correspondente ao ID informado,
+        /// ou <c>null</c> caso nenhuma consulta seja encontrada.
+        /// </returns>
+        Task<Appointment?> GetByIdAsync(Guid appointmentId);
     }
 }

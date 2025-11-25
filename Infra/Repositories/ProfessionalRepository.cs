@@ -74,5 +74,18 @@ namespace SGHSS.Infra.Repositories
             return await _context.Professionals
                 .AnyAsync(p => p.License == license);
         }
+        /// <summary>
+        /// Busca um profissional pelo seu identificador único.
+        /// </summary>
+        /// <param name="professionalId">ID do profissional desejado.</param>
+        /// <returns>
+        /// A entidade <see cref="Professional"/> localizada, ou <c>null</c>
+        /// caso não exista registro com o ID informado.
+        /// </returns>
+        public async Task<Professional?> GetByIdAsync(Guid professionalId)
+        {
+            return await _context.Professionals
+                .FirstOrDefaultAsync(p => p.Id == professionalId);
+        }
     }
 }

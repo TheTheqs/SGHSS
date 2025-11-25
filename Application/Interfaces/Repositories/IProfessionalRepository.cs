@@ -48,5 +48,15 @@ namespace SGHSS.Application.Interfaces.Repositories
         /// Uma tarefa que representa a operação assíncrona.
         /// </returns>
         Task AddAsync(Professional professional);
+
+        /// <summary>
+        /// Recupera um profissional pelo seu identificador único.
+        /// </summary>
+        /// <param name="professionalId">Identificador do profissional a ser localizado.</param>
+        /// <returns>
+        /// A entidade <see cref="Professional"/> correspondente ao ID informado,
+        /// ou <c>null</c> caso nenhum profissional seja encontrado.
+        /// </returns>
+        Task<Professional?> GetByIdAsync(Guid professionalId);
     }
 }
