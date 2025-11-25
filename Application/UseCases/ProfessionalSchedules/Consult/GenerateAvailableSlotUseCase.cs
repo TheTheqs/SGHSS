@@ -1,6 +1,8 @@
 ﻿// Application/UseCases/ProfessionalSchedules/Consult/GenerateAvailableSlotsUseCase.cs
 
 using SGHSS.Application.Interfaces.Repositories;
+using SGHSS.Application.UseCases.Common;
+using SGHSS.Domain.Enums;
 using SGHSS.Domain.Models;
 using SGHSS.Domain.Services;
 
@@ -34,22 +36,6 @@ namespace SGHSS.Application.UseCases.ProfessionalSchedules.Consult
     }
 
     /// <summary>
-    /// Representa um intervalo de horário disponível na agenda de um profissional.
-    /// </summary>
-    public class AvailableSlotDto
-    {
-        /// <summary>
-        /// Data e hora de início do intervalo disponível.
-        /// </summary>
-        public DateTime StartDateTime { get; set; }
-
-        /// <summary>
-        /// Data e hora de término do intervalo disponível.
-        /// </summary>
-        public DateTime EndDateTime { get; set; }
-    }
-
-    /// <summary>
     /// Representa a resposta da consulta de horários disponíveis de um profissional.
     /// </summary>
     public class GenerateAvailableSlotsResponse
@@ -62,7 +48,7 @@ namespace SGHSS.Application.UseCases.ProfessionalSchedules.Consult
         /// <summary>
         /// Coleção de intervalos disponíveis para agendamento.
         /// </summary>
-        public IReadOnlyCollection<AvailableSlotDto> Slots { get; set; } = new List<AvailableSlotDto>();
+        public IReadOnlyCollection<ScheduleSlotDto> Slots { get; set; } = new List<ScheduleSlotDto>();
     }
 
     /// <summary>
@@ -146,10 +132,11 @@ namespace SGHSS.Application.UseCases.ProfessionalSchedules.Consult
 
             // Mapeia o resultado para DTOs de saída.
             var slotDtos = availableIntervals
-                .Select(interval => new AvailableSlotDto
+                .Select(interval => new ScheduleSlotDto
                 {
                     StartDateTime = interval.Start,
-                    EndDateTime = interval.End
+                    EndDateTime = interval.End,
+                    Status = ScheduleSlotStatus.Available
                 })
                 .ToList();
 

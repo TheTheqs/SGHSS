@@ -5,7 +5,7 @@ namespace SGHSS.Domain.Enums
     public enum ScheduleSlotStatus
     {
         Available,
-        Booked,
+        Reserved,
         Canceled,
         Completed
     }
