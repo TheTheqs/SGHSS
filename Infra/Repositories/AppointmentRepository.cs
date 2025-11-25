@@ -43,6 +43,24 @@ namespace SGHSS.Infra.Repositories
         }
 
         /// <summary>
+        /// Atualiza uma consulta existente no banco de dados.
+        /// </summary>
+        /// <param name="appointment">
+        /// Instância de <see cref="Appointment"/> contendo as alterações
+        /// a serem persistidas.
+        /// </param>
+        /// <remarks>
+        /// A entidade é marcada como modificada no contexto e,
+        /// em seguida, as alterações são gravadas por meio de
+        /// <c>SaveChangesAsync</c>.
+        /// </remarks>
+        public async Task UpdateAsync(Appointment appointment)
+        {
+            _context.Appointments.Update(appointment);
+            await _context.SaveChangesAsync();
+        }
+
+        /// <summary>
         /// Recupera uma consulta pelo seu identificador único.
         /// </summary>
         /// <param name="appointmentId">ID da consulta desejada.</param>
@@ -53,6 +71,7 @@ namespace SGHSS.Infra.Repositories
         public async Task<Appointment?> GetByIdAsync(Guid appointmentId)
         {
             return await _context.Appointments
+                .Include(a => a.ScheduleSlot)
                 .FirstOrDefaultAsync(a => a.Id == appointmentId);
         }
     }
