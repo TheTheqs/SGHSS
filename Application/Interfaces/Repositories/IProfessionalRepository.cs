@@ -58,5 +58,25 @@ namespace SGHSS.Application.Interfaces.Repositories
         /// ou <c>null</c> caso nenhum profissional seja encontrado.
         /// </returns>
         Task<Professional?> GetByIdAsync(Guid professionalId);
+
+        /// <summary>
+        /// Atualiza o registro de um profissional na base de dados, incluindo suas
+        /// propriedades diretas e quaisquer entidades agregadas, como agenda e política.
+        /// </summary>
+        /// <param name="professional">
+        /// Instância atualizada da entidade <see cref="Professional"/> que será persistida.
+        /// Esta instância deve refletir o estado atual desejado do profissional e de seus
+        /// relacionamentos carregados.
+        /// </param>
+        /// <returns>
+        /// Uma tarefa assíncrona que representa a operação de atualização.
+        /// </returns>
+        /// <remarks>
+        /// Este método utiliza o rastreamento de alterações do Entity Framework Core.
+        /// Caso o profissional ou seus agregados já estejam sendo rastreados pelo contexto,
+        /// o EF detectará automaticamente as modificações e aplicará as mudanças durante
+        /// a chamada ao método de persistência.
+        /// </remarks>
+        Task UpdateAsync(Professional professional);
     }
 }

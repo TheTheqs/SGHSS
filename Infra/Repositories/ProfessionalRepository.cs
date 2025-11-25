@@ -87,5 +87,19 @@ namespace SGHSS.Infra.Repositories
             return await _context.Professionals
                 .FirstOrDefaultAsync(p => p.Id == professionalId);
         }
+
+        /// <summary>
+        /// Atualiza os dados do profissional no banco de dados.
+        /// </summary>
+        /// <param name="professional">Entidade <see cref="Professional"/> que será atualizada.</param>
+        /// <remarks>
+        /// O Entity Framework rastreia a entidade e salva todas as mudanças
+        /// realizadas, incluindo alterações em agregados relacionados.
+        /// </remarks>
+        public async Task UpdateAsync(Professional professional)
+        {
+            _context.Professionals.Update(professional);
+            await _context.SaveChangesAsync();
+        }
     }
 }
