@@ -34,18 +34,33 @@ namespace SGHSS.Infra.Repositories
             // - Agenda do profissional
             // - SchedulePolicy
             // - WeeklyWindows
-            // - Slots associados à agenda
+            // - Slots associados
             //
-            // O filtro de intervalo [from, to) será aplicado na camada de aplicação
-            // (no UseCase), permitindo reutilização flexível deste método.
-            var schedule = await _context.ProfessionalSchedules
+            // Observação: o filtro de intervalo [from, to) deverá ser aplicado
+            // na camada de aplicação para maior flexibilidade.
+            return await _context.ProfessionalSchedules
                 .Include(ps => ps.Professional)
                 .Include(ps => ps.SchedulePolicy)
                     .ThenInclude(sp => sp.WeeklyWindows)
                 .Include(ps => ps.ScheduleSlots)
                 .FirstOrDefaultAsync(ps => ps.Professional.Id == professionalId);
+        }
 
-            return schedule;
+        /// <inheritdoc />
+        public async Task<ProfessionalSchedule?> GetByIdWithSlotsAsync(Guid professionalScheduleId)
+        {
+            // Carrega:
+            // - Agenda profissional
+            // - Slots associados (todos)
+            // - SchedulePolicy e WeeklyWindows
+            //
+            // A ideia é garantir que todos os dados necessários para
+            // consultas de horários reservados estejam disponíveis.
+            return await _context.ProfessionalSchedules
+                .Include(ps => ps.SchedulePolicy)
+                    .ThenInclude(sp => sp.WeeklyWindows)
+                .Include(ps => ps.ScheduleSlots)
+                .FirstOrDefaultAsync(ps => ps.Id == professionalScheduleId);
         }
     }
 }
