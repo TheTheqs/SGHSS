@@ -27,5 +27,25 @@ namespace SGHSS.Domain.Models
 
         // Construtor padrão
         public LogActivity() { }
+
+        // ToString visando documentação de auditoria
+        public override string ToString()
+        {
+            var lines = new List<string>
+            {
+                "==== LOG ACTIVITY REPORT ====",
+                $"ID:               {Id}",
+                $"Timestamp:        {Timestamp:yyyy-MM-dd HH:mm:ss zzz}",
+                $"User:             {User?.Id} ({User?.Email})",
+                $"Action:           {Action}",
+                $"Result:           {Result}",
+                $"Description:      {Description}",
+                $"IP Address:       {IpAddress}",
+                $"Health Unit:      {(HealthUnit is null ? "N/A" : $"{HealthUnit.Id} - {HealthUnit.Name}")}",
+                "=============================="
+            };
+
+            return string.Join(Environment.NewLine, lines);
+        }
     }
 }
