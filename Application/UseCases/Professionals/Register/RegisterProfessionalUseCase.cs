@@ -41,6 +41,7 @@ namespace SGHSS.Application.UseCases.Professionals.Register
         {
             // Conversão dos dados do DTO para Value Objects de domínio
             var email = new Email(request.Email);
+            var password = Password.Create(request.Password);
             var phone = new Phone(request.Phone);
             var policy = SchedulePolicyMapper.ToDomain(request.SchedulePolicy);
             var license = new ProfessionalLicense(request.License);
@@ -67,6 +68,7 @@ namespace SGHSS.Application.UseCases.Professionals.Register
                 Id = Guid.NewGuid(),
                 Name = request.Name,
                 Email = email,
+                Password = password,
                 Phone = phone,
                 Status = UserStatus.Active,
                 Availability = Availability.Available,

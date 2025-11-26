@@ -43,6 +43,15 @@ namespace SGHSS.Infra.Configurations
                         value => new Email(value))
                    .HasMaxLength(254);
 
+            // Password como VO
+            builder.Property(u => u.Password)
+                   .IsRequired()
+                   .HasConversion(
+                        password => password.Hash,
+                        hash => Password.FromHash(hash)
+                    )
+                   .HasMaxLength(200);
+
             // Phone como VO
             builder.Property(u => u.Phone)
                    .IsRequired()

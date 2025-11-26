@@ -50,6 +50,7 @@ namespace SGHSS.Application.UseCases.Patients.Register
             var email = new Email(request.Email);
             var phone = new Phone(request.Phone);
             var cpf = new Cpf(request.Cpf);
+            var password = Password.Create(request.Password);
 
             // Regra de negócio: não permitir CPF duplicado
             bool cpfAlreadyExists = await _patientRepository.ExistsByCpfAsync(cpf);
@@ -76,6 +77,7 @@ namespace SGHSS.Application.UseCases.Patients.Register
                 Id = Guid.NewGuid(),
                 Name = request.Name,
                 Email = email,
+                Password = password,
                 Phone = phone,
                 Status = UserStatus.Active,
                 Cpf = cpf,

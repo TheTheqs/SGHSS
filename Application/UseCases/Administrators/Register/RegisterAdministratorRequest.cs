@@ -24,6 +24,11 @@ namespace SGHSS.Application.UseCases.Administrators.Register
         public string Email { get; init; } = string.Empty;
 
         /// <summary>
+        /// Senha pura fornecida no cadastro, que será transformada em um Value Object Password no UseCase.
+        /// </summary>
+        public string Password { get; init; } = string.Empty;
+
+        /// <summary>
         /// Número de telefone do Administrador (em formato normalizado pela camada de interface).
         /// </summary>
         public string Phone { get; init; } = string.Empty;

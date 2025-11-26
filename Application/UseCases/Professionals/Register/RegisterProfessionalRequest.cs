@@ -25,6 +25,11 @@ namespace SGHSS.Application.UseCases.Professionals.Register
         public string Email { get; init; } = string.Empty;
 
         /// <summary>
+        /// Senha pura fornecida no cadastro, que será transformada em um Value Object Password no UseCase.
+        /// </summary>
+        public string Password { get; init; } = string.Empty;
+
+        /// <summary>
         /// Número de telefone do profissional (em formato normalizado pela camada de interface).
         /// </summary>
         public string Phone { get; init; } = string.Empty;

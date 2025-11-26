@@ -19,9 +19,10 @@ namespace SGHSS.Domain.Models
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
-        public Email Email { get; set; }
-        public Phone Phone { get; set; }
-        public UserStatus Status { get; set; }
+        public Email Email { get; set; } // VO
+        public Password Password { get; set; } = null!; // VO
+        public Phone Phone { get; set; } // VO
+        public UserStatus Status { get; set; } // Enum
 
         // Relacionamentos
         public ICollection<Consent> Consents { get; set; } = new List<Consent>();

@@ -43,6 +43,9 @@ namespace SGHSS.Tests.TestData.Models
                     ? EmailGenerator.GenerateEmail(fullName)
                     : providedEmail;
 
+                // Password
+                string password = PasswordGenerator.GenerateRawPassword();
+
                 // Telefone válido (string já normalizada)
                 string phone = PhoneGenerator.GeneratePhone();
 
@@ -53,6 +56,7 @@ namespace SGHSS.Tests.TestData.Models
                 {
                     Name = fullName,
                     Email = email,
+                    Password = password,
                     Phone = phone,
                     AccessLevel = accessLevel,
 

@@ -39,6 +39,9 @@ namespace SGHSS.Tests.TestData.Models
                     ? CpfGenerator.GenerateCpf(withMask: false)
                     : providedCpf;
 
+                // Password
+                string password = PasswordGenerator.GenerateRawPassword();
+
                 // Telefone válido (string já normalizada para o VO de Phone)
                 string phone = PhoneGenerator.GeneratePhone();
 
@@ -60,6 +63,7 @@ namespace SGHSS.Tests.TestData.Models
                 {
                     Name = fullName,
                     Email = email,
+                    Password = password,
                     Phone = phone,
                     Cpf = cpf,
                     BirthDate = birthDate,

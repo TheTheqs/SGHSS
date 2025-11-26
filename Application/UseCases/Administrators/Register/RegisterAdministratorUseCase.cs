@@ -45,6 +45,7 @@ namespace SGHSS.Application.UseCases.Administrators.Register
             // Converte e valida os value objects
             var email = new Email(request.Email);
             var phone = new Phone(request.Phone);
+            var password = Password.Create(request.Password);
 
             // Verificação de duplicidade de e-mail
             bool emailAlreadyExists = await _administratorRepository.ExistsByEmailAsync(email);
@@ -62,6 +63,7 @@ namespace SGHSS.Application.UseCases.Administrators.Register
                 Id = Guid.NewGuid(),
                 Name = request.Name,
                 Email = email,
+                Password = password,
                 Phone = phone,
                 AccessLevel = request.AccessLevel,
                 Status = UserStatus.Active
