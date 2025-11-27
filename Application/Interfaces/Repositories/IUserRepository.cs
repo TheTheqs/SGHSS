@@ -1,6 +1,7 @@
 ﻿// Application/Interfaces/Repositories/IUserRepository.cs
 
 using SGHSS.Domain.Models;
+using SGHSS.Domain.ValueObjects;
 
 namespace SGHSS.Application.Interfaces.Repositories
 {
@@ -18,5 +19,18 @@ namespace SGHSS.Application.Interfaces.Repositories
         /// ou <c>null</c> caso nenhum usuário seja encontrado.
         /// </returns>
         Task<User?> GetByIdAsync(Guid userId);
+
+        /// <summary>
+        /// Recupera um usuário pelo seu endereço de e-mail.
+        /// </summary>
+        /// <param name="email">
+        /// Endereço de e-mail encapsulado no value object <see cref="Email"/>.
+        /// </param>
+        /// <returns>
+        /// Uma instância concreta de <see cref="User"/> (por exemplo,
+        /// <see cref="Patient"/>, <see cref="Professional"/> ou <see cref="Administrator"/>),
+        /// ou <c>null</c> caso nenhum usuário seja encontrado com o e-mail informado.
+        /// </returns>
+        Task<User?> GetByEmailAsync(Email email);
     }
 }

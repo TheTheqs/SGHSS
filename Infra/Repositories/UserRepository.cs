@@ -3,6 +3,7 @@
 using Microsoft.EntityFrameworkCore;
 using SGHSS.Application.Interfaces.Repositories;
 using SGHSS.Domain.Models;
+using SGHSS.Domain.ValueObjects;
 using SGHSS.Infra.Persistence;
 
 namespace SGHSS.Infra.Repositories
@@ -63,6 +64,51 @@ namespace SGHSS.Infra.Repositories
             // Tenta localizar como administrador
             var administrator = await _context.Administrators
                 .FirstOrDefaultAsync(a => a.Id == userId);
+
+            if (administrator is not null)
+            {
+                return administrator;
+            }
+
+            return null;
+        }
+
+
+        /// <summary>
+        /// Recupera um usuário pelo seu endereço de e-mail, buscando entre
+        /// pacientes, profissionais e administradores.
+        /// </summary>
+        /// <param name="email">
+        /// Endereço de e-mail encapsulado no value object <see cref="Email"/>.
+        /// </param>
+        /// <returns>
+        /// Uma instância concreta de <see cref="User"/> (por exemplo,
+        /// <see cref="Patient"/>, <see cref="Professional"/> ou <see cref="Administrator"/>),
+        /// ou <c>null</c> caso nenhum usuário seja encontrado com o e-mail informado.
+        /// </returns>
+        public async Task<User?> GetByEmailAsync(Email email)
+        {
+            // Tenta localizar como paciente
+            var patient = await _context.Patients
+                .FirstOrDefaultAsync(p => p.Email.Value == email.Value);
+
+            if (patient is not null)
+            {
+                return patient;
+            }
+
+            // Tenta localizar como profissional
+            var professional = await _context.Professionals
+                .FirstOrDefaultAsync(p => p.Email.Value == email.Value);
+
+            if (professional is not null)
+            {
+                return professional;
+            }
+
+            // Tenta localizar como administrador
+            var administrator = await _context.Administrators
+                .FirstOrDefaultAsync(a => a.Email.Value == email.Value);
 
             if (administrator is not null)
             {

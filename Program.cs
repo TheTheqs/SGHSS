@@ -1,12 +1,16 @@
 // Program.cs for .NET 10 with Swagger/OpenAPI setup
 
 using Microsoft.EntityFrameworkCore;
+using SGHSS.Application.Interfaces.Services;
 using SGHSS.Infra.Persistence;
+using SGHSS.Infra.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+// Scopos
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 // Configuração do DbContext com PostgreSQL
 builder.Services.AddDbContext<SGHSSDbContext>(options =>
