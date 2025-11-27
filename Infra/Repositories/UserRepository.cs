@@ -90,7 +90,7 @@ namespace SGHSS.Infra.Repositories
         {
             // Tenta localizar como paciente
             var patient = await _context.Patients
-                .FirstOrDefaultAsync(p => p.Email.Value == email.Value);
+                .FirstOrDefaultAsync(p => p.Email == email);
 
             if (patient is not null)
             {
@@ -99,7 +99,7 @@ namespace SGHSS.Infra.Repositories
 
             // Tenta localizar como profissional
             var professional = await _context.Professionals
-                .FirstOrDefaultAsync(p => p.Email.Value == email.Value);
+                .FirstOrDefaultAsync(p => p.Email == email);
 
             if (professional is not null)
             {
@@ -108,7 +108,7 @@ namespace SGHSS.Infra.Repositories
 
             // Tenta localizar como administrador
             var administrator = await _context.Administrators
-                .FirstOrDefaultAsync(a => a.Email.Value == email.Value);
+                .FirstOrDefaultAsync(a => a.Email == email);
 
             if (administrator is not null)
             {
