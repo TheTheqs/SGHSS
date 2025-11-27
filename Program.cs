@@ -98,6 +98,10 @@ using (var scope = app.Services.CreateScope())
 //  PIPELINE HTTP
 // =====================
 
+// Middlewares
+app.UseMiddleware<SGHSS.Interface.Middlewares.GlobalExceptionHandlingMiddleware>();
+
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -105,8 +109,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-// Ordem correta: autenticação -> autorização
 app.UseAuthentication();
 app.UseAuthorization();
 
