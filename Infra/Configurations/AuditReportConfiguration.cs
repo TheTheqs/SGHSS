@@ -27,7 +27,7 @@ namespace SGHSS.Infra.Configurations
 
             builder.Property(ar => ar.ReportDetails)
                    .IsRequired()
-                   .HasMaxLength(2000);
+                   .HasColumnType("text");
 
             // Relacionamento: muitos relatórios -> um Administrador
             builder.HasOne(ar => ar.CreatedBy)

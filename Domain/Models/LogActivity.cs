@@ -22,7 +22,7 @@ namespace SGHSS.Domain.Models
         public LogResult Result { get; set; } // Enum
 
         // Relacionamentos
-        public User User { get; set; } = null!;
+        public User? User { get; set; } = null!;
         public HealthUnit? HealthUnit { get; set; }
 
         // Construtor padrão

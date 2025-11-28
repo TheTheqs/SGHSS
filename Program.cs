@@ -4,11 +4,15 @@
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using Microsoft.IdentityModel.Tokens;
 using SGHSS.Application.Interfaces.Repositories;
 using SGHSS.Application.Interfaces.Services;
 using SGHSS.Application.UseCases.Administrators.Initialize;
+using SGHSS.Application.UseCases.AuditReports.Consult;
+using SGHSS.Application.UseCases.AuditReports.Generate;
 using SGHSS.Application.UseCases.Authentication;
+using SGHSS.Application.UseCases.LogActivities.Register;
 using SGHSS.Infra.Persistence;
 using SGHSS.Infra.Repositories;
 using SGHSS.Infra.Services;
@@ -22,7 +26,37 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Minha API", Version = "v1" });
+
+    // Config JWT Bearer (simples e direto)
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization. Exemplo: Bearer {token}",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
+
 
 // =====================
 //  DB CONTEXT (PostgreSQL)
@@ -45,11 +79,17 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 
 // Repositórios
 builder.Services.AddScoped<IAdministratorRepository, AdministratorRepository>();
+builder.Services.AddScoped<IHealthUnitRepository,  HealthUnitRepository>();
+builder.Services.AddScoped<ILogActivityRepository, LogActivityRepository>();
+builder.Services.AddScoped<IAuditReportRepository, AuditReportRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 // UseCases
 builder.Services.AddScoped<EnsureDefaultSuperAdministratorUseCase>();
 builder.Services.AddScoped<AuthenticateUserUseCase>();
+builder.Services.AddScoped<RegisterLogActivityUseCase>();
+builder.Services.AddScoped<GenerateAuditReportUseCase>();
+builder.Services.AddScoped<ConsultAuditReportsByAdministratorUseCase>();
 
 // =====================
 //  AUTENTICAÇÃO JWT
@@ -105,7 +145,10 @@ app.UseMiddleware<SGHSS.Interface.Middlewares.GlobalExceptionHandlingMiddleware>
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Minha API V1");
+    });
 }
 
 app.UseHttpsRedirection();

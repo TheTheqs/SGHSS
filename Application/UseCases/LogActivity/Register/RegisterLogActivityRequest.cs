@@ -14,7 +14,7 @@ namespace SGHSS.Application.UseCases.LogActivities.Register
         /// <summary>
         /// Identificador do usuário responsável pela ação.
         /// </summary>
-        public Guid UserId { get; init; }
+        public Guid? UserId { get; init; }
 
         /// <summary>
         /// Identificador da unidade de saúde relacionada à ação,

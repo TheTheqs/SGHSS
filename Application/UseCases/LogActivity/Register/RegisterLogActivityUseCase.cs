@@ -81,12 +81,11 @@ namespace SGHSS.Application.UseCases.LogActivities.Register
             }
 
             // Resolve o usuário responsável pela ação
-            var user = await _userRepository.GetByIdAsync(request.UserId);
+            User? user = null;
 
-            if (user is null)
+            if (request.UserId.HasValue)
             {
-                throw new InvalidOperationException(
-                    "Não foi possível localizar um usuário para o identificador informado.");
+                user = await _userRepository.GetByIdAsync(request.UserId.Value);
             }
 
             // Resolve, se informado, a unidade de saúde relacionada

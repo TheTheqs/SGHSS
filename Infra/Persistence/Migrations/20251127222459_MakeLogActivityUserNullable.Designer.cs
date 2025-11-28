@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SGHSS.Infra.Persistence;
@@ -11,9 +12,11 @@ using SGHSS.Infra.Persistence;
 namespace SGHSS.Infra.Persistence.Migrations
 {
     [DbContext(typeof(SGHSSDbContext))]
-    partial class SGHSSDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251127222459_MakeLogActivityUserNullable")]
+    partial class MakeLogActivityUserNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -112,7 +115,8 @@ namespace SGHSS.Infra.Persistence.Migrations
 
                     b.Property<string>("ReportDetails")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
 
                     b.HasKey("Id");
 
