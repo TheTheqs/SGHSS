@@ -96,9 +96,18 @@ namespace SGHSS.Application.UseCases.Administrators.Update
 
             // Persiste as alterações na unidade de saúde
             await _healthUnitRepository.UpdateAsync(healthUnit);
+            var bedDtos = healthUnit.Beds
+            .Select(b => new BedDto
+            {
+                BedId = b.Id,
+                BedNumber = b.BedNumber,
+                Type = b.Type,
+                Status = b.Status
+            })
+            .ToList();
 
             // Monta resposta com o estado atual dos leitos
-            return new ManageBedsResponse(healthUnit.Id, healthUnit.Beds.ToList());
+            return new ManageBedsResponse(healthUnit.Id, bedDtos);
         }
 
         /// <summary>
@@ -130,9 +139,18 @@ namespace SGHSS.Application.UseCases.Administrators.Update
 
             // Persiste as alterações
             await _healthUnitRepository.UpdateAsync(healthUnit);
+            var bedDtos = healthUnit.Beds
+            .Select(b => new BedDto
+            {
+                BedId = b.Id,
+                BedNumber = b.BedNumber,
+                Type = b.Type,
+                Status = b.Status
+            })
+            .ToList();
 
             // Monta resposta com o estado atual dos leitos
-            return new ManageBedsResponse(healthUnit.Id, healthUnit.Beds.ToList());
+            return new ManageBedsResponse(healthUnit.Id, bedDtos);
         }
 
         public async Task<ManageBedsResponse> RemoveBedByNumberAsync(Guid healthUnitId, string bedNumber)
@@ -175,8 +193,17 @@ namespace SGHSS.Application.UseCases.Administrators.Update
             healthUnit.Beds.Remove(bed);
 
             await _healthUnitRepository.UpdateAsync(healthUnit);
+            var bedDtos = healthUnit.Beds
+            .Select(b => new BedDto
+            {
+                BedId = b.Id,
+                BedNumber = b.BedNumber,
+                Type = b.Type,
+                Status = b.Status
+            })
+            .ToList();
 
-            return new ManageBedsResponse(healthUnit.Id, healthUnit.Beds.ToList());
+            return new ManageBedsResponse(healthUnit.Id, bedDtos);
         }
     }
 }

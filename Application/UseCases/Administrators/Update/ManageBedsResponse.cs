@@ -1,7 +1,6 @@
 ﻿// Application/UseCases/Administrators/Update/ManageBedsResponse.cs
 
-
-using SGHSS.Domain.Models;
+using SGHSS.Application.UseCases.Common;
 
 namespace SGHSS.Application.UseCases.Administrators.Update
 {
@@ -11,8 +10,8 @@ namespace SGHSS.Application.UseCases.Administrators.Update
     /// </summary>
     /// <remarks>
     /// Após a execução da operação, esta resposta retorna o identificador
-    /// da unidade afetada e o estado atualizado da lista de leitos,
-    /// permitindo que camadas superiores exibam ou validem as mudanças.
+    /// da unidade afetada e o estado atualizado da lista de leitos
+    /// no formato seguro <see cref="BedDto"/>, evitando ciclos de serialização.
     /// </remarks>
     public class ManageBedsResponse
     {
@@ -22,17 +21,17 @@ namespace SGHSS.Application.UseCases.Administrators.Update
         public Guid HealthUnitId { get; init; }
 
         /// <summary>
-        /// Lista resultante de leitos após a operação de adição ou remoção.
-        /// Representa o estado atualizado da unidade.
+        /// Lista resultante de leitos após a operação de adição ou remoção,
+        /// representados como DTOs para evitar retorno de entidades de domínio.
         /// </summary>
-        public IReadOnlyList<Bed> Beds { get; init; } = new List<Bed>();
+        public IReadOnlyList<BedDto> Beds { get; init; } = new List<BedDto>();
 
         /// <summary>
         /// Cria uma nova instância da resposta de gerenciamento de leitos.
         /// </summary>
         /// <param name="healthUnitId">O identificador da unidade afetada.</param>
-        /// <param name="beds">Lista atualizada de leitos.</param>
-        public ManageBedsResponse(Guid healthUnitId, IReadOnlyList<Bed> beds)
+        /// <param name="beds">Lista atualizada de leitos no formato DTO.</param>
+        public ManageBedsResponse(Guid healthUnitId, IReadOnlyList<BedDto> beds)
         {
             HealthUnitId = healthUnitId;
             Beds = beds;

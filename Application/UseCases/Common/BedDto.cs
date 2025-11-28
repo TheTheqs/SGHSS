@@ -21,6 +21,11 @@ namespace SGHSS.Application.UseCases.Common
         /// <summary>
         /// Identificador lógico ou código do leito dentro da unidade de saúde.
         /// </summary>
+        public Guid BedId { get; init; }
+
+        /// <summary>
+        /// Identificador lógico ou código do leito dentro da unidade de saúde.
+        /// </summary>
         public string BedNumber { get; init; } = string.Empty;
 
         /// <summary>
