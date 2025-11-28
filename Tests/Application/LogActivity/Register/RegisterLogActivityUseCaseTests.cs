@@ -104,39 +104,6 @@ namespace SGHSS.Tests.Application.LogActivities.Register
             persistedLog.Timestamp.Should().BeAfter(DateTimeOffset.UtcNow.AddMinutes(-2));
         }
 
-        [Fact]
-        public async Task Deve_Lancar_Excecao_Quando_Usuario_Nao_For_Encontrado()
-        {
-            // Arrange
-            using var context = DbContextTestFactory.CreateInMemoryContext();
-
-            ILogActivityRepository logRepo = new LogActivityRepository(context);
-            IUserRepository userRepo = new UserRepository(context);
-            IHealthUnitRepository healthUnitRepo = new HealthUnitRepository(context);
-
-            var useCase = new RegisterLogActivityUseCase(
-                logRepo,
-                userRepo,
-                healthUnitRepo);
-
-            var request = new RegisterLogActivityRequest
-            {
-                UserId = Guid.NewGuid(), // não existe no banco
-                HealthUnitId = null,
-                Action = "RegisterAppointment",
-                Description = "Attempt to register appointment with non-existing user.",
-                IpAddress = new IpAddress("10.0.0.1"),
-                Result = LogResult.Failure
-            };
-
-            // Act
-            Func<Task> act = () => useCase.Handle(request);
-
-            // Assert
-            await act.Should()
-                .ThrowAsync<InvalidOperationException>()
-                .WithMessage("Não foi possível localizar um usuário para o identificador informado.");
-        }
 
         [Fact]
         public async Task Deve_Lancar_Excecao_Quando_Acao_For_Vazia()

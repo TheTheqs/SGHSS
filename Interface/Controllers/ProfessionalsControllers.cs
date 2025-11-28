@@ -1,0 +1,108 @@
+﻿// Interface/Controllers/ProfessionalsController.cs
+
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using SGHSS.Application.UseCases.LogActivities.Register;
+using SGHSS.Application.UseCases.Professionals.Register;
+using SGHSS.Domain.Enums;
+
+namespace SGHSS.Interface.Controllers
+{
+    /// <summary>
+    /// Controlador responsável por registrar novos profissionais no sistema.
+    /// Apenas Administradores com nível de acesso básico ou superior
+    /// possuem permissão para acessar este endpoint.
+    /// </summary>
+    [ApiController]
+    [Route("api/[controller]")]
+    public class ProfessionalsController : BaseApiController
+    {
+        private readonly RegisterProfessionalUseCase _registerProfessionalUseCase;
+
+        /// <summary>
+        /// Cria uma nova instância do controlador de profissionais.
+        /// </summary>
+        /// <param name="registerProfessionalUseCase">
+        /// Caso de uso responsável por registrar profissionais.
+        /// </param>
+        /// <param name="registerLogActivityUseCase">
+        /// Caso de uso responsável por registrar logs de atividade.
+        /// </param>
+        public ProfessionalsController(
+            RegisterProfessionalUseCase registerProfessionalUseCase,
+            RegisterLogActivityUseCase registerLogActivityUseCase)
+            : base(registerLogActivityUseCase)
+        {
+            _registerProfessionalUseCase = registerProfessionalUseCase;
+        }
+
+        /// <summary>
+        /// Registra um novo profissional no sistema.
+        /// Requer um Administrador autenticado com nível de acesso básico ou superior.
+        /// </summary>
+        /// <param name="request">Dados necessários para criar o profissional.</param>
+        /// <returns>
+        /// Um <see cref="RegisterProfessionalResponse"/> contendo o ID do profissional criado.
+        /// </returns>
+        [HttpPost("register")]
+        [Authorize]
+        [ProducesResponseType(typeof(RegisterProfessionalResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<ActionResult<RegisterProfessionalResponse>> Register(
+            [FromBody] RegisterProfessionalRequest request)
+        {
+            // Apenas Administradores com nível Basic (2) ou superior
+            if (!HasMinimumAccessLevel(AccessLevel.Basic))
+            {
+                return Forbid();
+            }
+
+            LogResult logResult = LogResult.Success;
+            string logDescription = "Profissional criado com sucesso.";
+            Guid? userId = GetUserId(); // admin que está registrando o profissional
+
+            try
+            {
+                var response = await _registerProfessionalUseCase.Handle(request);
+                return CreatedAtAction(nameof(Register), response);
+            }
+            catch (ArgumentException ex)
+            {
+                logResult = LogResult.Failure;
+                logDescription = $"Falha ao registrar profissional: {ex.Message}";
+
+                return BadRequest(new
+                {
+                    error = ex.Message
+                });
+            }
+            catch (InvalidOperationException ex)
+            {
+                logResult = LogResult.Failure;
+                logDescription = $"Falha ao registrar profissional: {ex.Message}";
+
+                return BadRequest(new
+                {
+                    error = ex.Message
+                });
+            }
+            catch (Exception)
+            {
+                logResult = LogResult.Failure;
+                logDescription = "Erro inesperado ao registrar profissional.";
+                throw;
+            }
+            finally
+            {
+                await RegistrarLogAsync(
+                    userId,
+                    action: "Professionals.Register",
+                    description: logDescription,
+                    result: logResult,
+                    healthUnitId: null
+                );
+            }
+        }
+    }
+}
