@@ -98,6 +98,7 @@ builder.Services.AddScoped<ConsultAuditReportsByAdministratorUseCase>();
 builder.Services.AddScoped<RegisterAdministratorUseCase>();
 builder.Services.AddScoped<RegisterPatientUseCase>();
 builder.Services.AddScoped<RegisterProfessionalUseCase>();
+builder.Services.AddScoped<RegisterHealthUnitUseCase>();
 
 // =====================
 //  AUTENTICAÇÃO JWT
