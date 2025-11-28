@@ -18,6 +18,7 @@ using SGHSS.Infra.Repositories;
 using SGHSS.Infra.Services;
 using System.Text;
 using SGHSS.Application.UseCases.Administrators.Register;
+using SGHSS.Application.UseCases.Patients.Register;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -83,6 +84,7 @@ builder.Services.AddScoped<IAdministratorRepository, AdministratorRepository>();
 builder.Services.AddScoped<IHealthUnitRepository,  HealthUnitRepository>();
 builder.Services.AddScoped<ILogActivityRepository, LogActivityRepository>();
 builder.Services.AddScoped<IAuditReportRepository, AuditReportRepository>();
+builder.Services.AddScoped<IPatientRepository, PatientRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 // UseCases
@@ -92,6 +94,7 @@ builder.Services.AddScoped<RegisterLogActivityUseCase>();
 builder.Services.AddScoped<GenerateAuditReportUseCase>();
 builder.Services.AddScoped<ConsultAuditReportsByAdministratorUseCase>();
 builder.Services.AddScoped<RegisterAdministratorUseCase>();
+builder.Services.AddScoped<RegisterPatientUseCase>();
 
 // =====================
 //  AUTENTICAÇÃO JWT

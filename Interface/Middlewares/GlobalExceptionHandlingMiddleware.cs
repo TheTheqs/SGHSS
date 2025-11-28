@@ -57,7 +57,7 @@ namespace SGHSS.Interface.Middlewares
                     statusCode = (int)HttpStatusCode.BadRequest;
                     message = "Um dos campos enviados excede o tamanho máximo permitido.";
 
-                    // Loga com mais detalhe para você, mas sem expor pro cliente
+                    // Loga com mais detalhe
                     _logger.LogError(dbEx,
                         "Erro de tamanho de campo ao acessar o banco de dados. SqlState: {SqlState}, Message: {PgMessage}",
                         pgEx.SqlState,
