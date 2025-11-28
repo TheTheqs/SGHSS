@@ -23,15 +23,17 @@ namespace SGHSS.Application.UseCases.Administrators.Read
         /// <summary>
         /// Obtém as camas vinculadas à unidade de saúde informada, aplicando filtros opcionais.
         /// </summary>
-        /// <param name="healthUnitId">ID da unidade de saúde de onde as camas serão consultadas.</param>
-        /// <param name="type">Tipo da cama (opcional).</param>
-        /// <param name="status">Status da cama (opcional).</param>
-        /// <returns>Coleção filtrada de camas da unidade.</returns>
+        /// <param name="request">
+        /// Objeto contendo o ID da unidade e filtros opcionais de tipo e status.
+        /// </param>
+        /// <returns>
+        /// Um <see cref="ConsultHealthUnitBedsResponse"/> com a coleção filtrada de camas.
+        /// </returns>
         /// <exception cref="InvalidOperationException">Lançada quando a unidade não existe.</exception>
-        public async Task<ICollection<Bed>> Handle(Guid healthUnitId, BedType? type = null, BedStatus? status = null)
+        public async Task<ConsultHealthUnitBedsResponse> Handle(ConsultHealthUnitBedsRequest request)
         {
             // 1. Busca a unidade junto com as camas
-            HealthUnit? unit = await _healthUnitRepository.GetByIdAsync(healthUnitId);
+            HealthUnit? unit = await _healthUnitRepository.GetByIdAsync(request.HealthUnitId);
 
             if (unit is null)
                 throw new InvalidOperationException("A unidade de saúde informada não existe.");
@@ -40,13 +42,15 @@ namespace SGHSS.Application.UseCases.Administrators.Read
             IEnumerable<Bed> beds = unit.Beds;
 
             // 3. Aplica filtros somente quando forem especificados
-            if (type.HasValue)
-                beds = beds.Where(b => b.Type == type.Value);
+            if (request.Type.HasValue)
+                beds = beds.Where(b => b.Type == request.Type.Value);
 
-            if (status.HasValue)
-                beds = beds.Where(b => b.Status == status.Value);
+            if (request.Status.HasValue)
+                beds = beds.Where(b => b.Status == request.Status.Value);
 
-            return beds.ToList();
+            var resultBeds = beds.ToList();
+
+            return new ConsultHealthUnitBedsResponse(request.HealthUnitId, resultBeds);
         }
     }
 }
