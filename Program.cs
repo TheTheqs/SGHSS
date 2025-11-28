@@ -17,6 +17,7 @@ using SGHSS.Infra.Persistence;
 using SGHSS.Infra.Repositories;
 using SGHSS.Infra.Services;
 using System.Text;
+using SGHSS.Application.UseCases.Administrators.Register;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -90,6 +91,7 @@ builder.Services.AddScoped<AuthenticateUserUseCase>();
 builder.Services.AddScoped<RegisterLogActivityUseCase>();
 builder.Services.AddScoped<GenerateAuditReportUseCase>();
 builder.Services.AddScoped<ConsultAuditReportsByAdministratorUseCase>();
+builder.Services.AddScoped<RegisterAdministratorUseCase>();
 
 // =====================
 //  AUTENTICAÇÃO JWT

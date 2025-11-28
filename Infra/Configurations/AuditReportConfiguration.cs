@@ -29,7 +29,6 @@ namespace SGHSS.Infra.Configurations
                    .IsRequired()
                    .HasColumnType("text");
 
-            // Relacionamento: muitos relatórios -> um Administrador
             builder.HasOne(ar => ar.CreatedBy)
                    .WithMany(a => a.AuditReports);
         }

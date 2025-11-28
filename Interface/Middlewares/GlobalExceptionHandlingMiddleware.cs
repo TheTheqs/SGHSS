@@ -1,7 +1,9 @@
 ﻿// Interface/Middlewares/GlobalExceptionHandlingMiddleware.cs
 
-using System.Net;
+using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using SGHSS.Interface.Models;
+using System.Net;
 
 namespace SGHSS.Interface.Middlewares
 {
@@ -48,7 +50,19 @@ namespace SGHSS.Interface.Middlewares
                     message = argEx.Message;
                     break;
 
-                
+                case DbUpdateException dbEx
+                    when dbEx.InnerException is PostgresException pgEx
+                         && pgEx.SqlState == "22001":
+                    // 22001 = string data right truncation (valor muito longo para o campo)
+                    statusCode = (int)HttpStatusCode.BadRequest;
+                    message = "Um dos campos enviados excede o tamanho máximo permitido.";
+
+                    // Loga com mais detalhe para você, mas sem expor pro cliente
+                    _logger.LogError(dbEx,
+                        "Erro de tamanho de campo ao acessar o banco de dados. SqlState: {SqlState}, Message: {PgMessage}",
+                        pgEx.SqlState,
+                        pgEx.MessageText);
+                    break;
 
                 default:
                     // Para erros inesperados
@@ -63,7 +77,7 @@ namespace SGHSS.Interface.Middlewares
             var errorResponse = new ErrorResponse
             {
                 StatusCode = statusCode,
-                Message = message // aqui já está a mensagem original do ArgumentException
+                Message = message
             };
 
             await context.Response.WriteAsJsonAsync(errorResponse);
