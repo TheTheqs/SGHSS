@@ -42,5 +42,13 @@ namespace SGHSS.Application.Interfaces.Repositories
         /// </summary>
         /// <param name="administrator">Instância de <see cref="Administrator"/> a ser persistida.</param>
         Task AddAsync(Administrator administrator);
+
+        /// <summary>
+        /// Recupera todos os administradores cadastrados.
+        /// </summary>
+        /// <returns>
+        /// Uma coleção somente leitura contendo todas as instâncias de <see cref="Administrator"/> persistidas.
+        /// </returns>
+        Task<IReadOnlyList<Administrator>> GetAllAsync();
     }
 }

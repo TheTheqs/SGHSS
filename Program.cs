@@ -20,6 +20,10 @@ using System.Text;
 using SGHSS.Application.UseCases.Administrators.Register;
 using SGHSS.Application.UseCases.Patients.Register;
 using SGHSS.Application.UseCases.Professionals.Register;
+using SGHSS.Application.UseCases.Administrators.Read;
+using SGHSS.Application.UseCases.Patients.Read;
+using SGHSS.Application.UseCases.Professionals.Read;
+using SGHSS.Application.UseCases.Administrators.Update;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -99,6 +103,11 @@ builder.Services.AddScoped<RegisterAdministratorUseCase>();
 builder.Services.AddScoped<RegisterPatientUseCase>();
 builder.Services.AddScoped<RegisterProfessionalUseCase>();
 builder.Services.AddScoped<RegisterHealthUnitUseCase>();
+builder.Services.AddScoped<GetAllAdministratorsUseCase>();
+builder.Services.AddScoped<GetAllPatientsUseCase>();
+builder.Services.AddScoped<GetAllProfessionalsUseCase>();
+builder.Services.AddScoped<GetAllHealthUnitsUseCase>();
+builder.Services.AddScoped<ManageBedsUseCase>();
 
 // =====================
 //  AUTENTICAÇÃO JWT

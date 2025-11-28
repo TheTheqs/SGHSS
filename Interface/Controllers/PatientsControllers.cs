@@ -2,7 +2,9 @@
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SGHSS.Application.UseCases.Common;
 using SGHSS.Application.UseCases.LogActivities.Register;
+using SGHSS.Application.UseCases.Patients.Read;
 using SGHSS.Application.UseCases.Patients.Register;
 using SGHSS.Domain.Enums;
 
@@ -18,22 +20,20 @@ namespace SGHSS.Interface.Controllers
     public class PatientsController : BaseApiController
     {
         private readonly RegisterPatientUseCase _registerPatientUseCase;
+        private readonly GetAllPatientsUseCase _getAllPatientsUseCase;
 
         /// <summary>
-        /// Cria uma nova instância do controlador de pacientes.
+        /// Instancia um novo controlador de pacientes,
+        /// habilitando registro e listagem de pacientes.
         /// </summary>
-        /// <param name="registerPatientUseCase">
-        /// Caso de uso responsável por registrar pacientes.
-        /// </param>
-        /// <param name="registerLogActivityUseCase">
-        /// Caso de uso responsável por registrar logs de atividade.
-        /// </param>
         public PatientsController(
             RegisterPatientUseCase registerPatientUseCase,
+            GetAllPatientsUseCase getAllPatientsUseCase,
             RegisterLogActivityUseCase registerLogActivityUseCase)
             : base(registerLogActivityUseCase)
         {
             _registerPatientUseCase = registerPatientUseCase;
+            _getAllPatientsUseCase = getAllPatientsUseCase;
         }
 
         /// <summary>
@@ -98,6 +98,46 @@ namespace SGHSS.Interface.Controllers
                 await RegistrarLogAsync(
                     userId,
                     action: "Patients.Register",
+                    description: logDescription,
+                    result: logResult,
+                    healthUnitId: null
+                );
+            }
+        }
+
+        /// <summary>
+        /// Obtém todos os pacientes do sistema em formato resumido (ID + Nome).
+        /// Requer nível de acesso Basic (2) ou superior.
+        /// </summary>
+        [HttpGet("all")]
+        [Authorize]
+        [ProducesResponseType(typeof(GetAllResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<ActionResult<GetAllResponse>> GetAll()
+        {
+            if (!HasMinimumAccessLevel(AccessLevel.Basic))
+                return Forbid();
+
+            LogResult logResult = LogResult.Success;
+            string logDescription = "Consulta de todos os pacientes realizada com sucesso.";
+            Guid? userId = GetUserId();
+
+            try
+            {
+                var response = await _getAllPatientsUseCase.Handle();
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                logResult = LogResult.Failure;
+                logDescription = $"Falha ao consultar pacientes: {ex.Message}";
+                throw;
+            }
+            finally
+            {
+                await RegistrarLogAsync(
+                    userId,
+                    action: "Patients.GetAll",
                     description: logDescription,
                     result: logResult,
                     healthUnitId: null

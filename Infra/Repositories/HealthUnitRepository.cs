@@ -87,5 +87,17 @@ namespace SGHSS.Infra.Repositories
             _context.HealthUnits.Update(healthUnit);
             await _context.SaveChangesAsync();
         }
+        /// <summary>
+        /// Recupera todas as unidades de saúde cadastradas na base de dados.
+        /// </summary>
+        /// <returns>
+        /// Uma lista somente leitura contendo todas as instâncias de <see cref="HealthUnit"/>.
+        /// </returns>
+        public async Task<IReadOnlyList<HealthUnit>> GetAllAsync()
+        {
+            return await _context.HealthUnits
+                .AsNoTracking()
+                .ToListAsync();
+        }
     }
 }

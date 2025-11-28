@@ -66,5 +66,19 @@ namespace SGHSS.Infra.Repositories
             await _context.Administrators.AddAsync(administrator);
             await _context.SaveChangesAsync();
         }
+
+        
+        /// <summary>
+        /// Recupera todos os administradores cadastrados na base de dados.
+        /// </summary>
+        /// <returns>
+        /// Uma lista somente leitura contendo todas as instâncias de <see cref="Administrator"/>.
+        /// </returns>
+        public async Task<IReadOnlyList<Administrator>> GetAllAsync()
+        {
+            return await _context.Administrators
+                .AsNoTracking()
+                .ToListAsync();
+        }
     }
 }

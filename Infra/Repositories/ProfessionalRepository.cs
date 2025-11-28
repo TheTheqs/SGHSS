@@ -101,5 +101,18 @@ namespace SGHSS.Infra.Repositories
             _context.Professionals.Update(professional);
             await _context.SaveChangesAsync();
         }
+
+        /// <summary>
+        /// Recupera todos os profissionais cadastrados na base de dados.
+        /// </summary>
+        /// <returns>
+        /// Uma lista somente leitura contendo todas as instâncias de <see cref="Professional"/>.
+        /// </returns>
+        public async Task<IReadOnlyList<Professional>> GetAllAsync()
+        {
+            return await _context.Professionals
+                .AsNoTracking()
+                .ToListAsync();
+        }
     }
 }

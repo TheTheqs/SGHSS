@@ -104,5 +104,18 @@ namespace SGHSS.Infra.Repositories
             await _context.Patients.AddAsync(patient);
             await _context.SaveChangesAsync();
         }
+        
+        /// <summary>
+        /// Recupera todos os pacientes cadastrados na base de dados.
+        /// </summary>
+        /// <returns>
+        /// Uma lista somente leitura contendo todas as instâncias de <see cref="Patient"/>.
+        /// </returns>
+        public async Task<IReadOnlyList<Patient>> GetAllAsync()
+        {
+            return await _context.Patients
+                .AsNoTracking()
+                .ToListAsync();
+        }
     }
 }

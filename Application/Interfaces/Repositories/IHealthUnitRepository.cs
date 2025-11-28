@@ -44,9 +44,13 @@ namespace SGHSS.Application.Interfaces.Repositories
         /// </summary>
         /// <param name="healthUnit">A instância atualizada da entidade a ser persistida.</param>
         Task UpdateAsync(HealthUnit healthUnit);
-
-
-
-
+        
+        /// <summary>
+        /// Recupera todas as unidades de saúde cadastradas.
+        /// </summary>
+        /// <returns>
+        /// Uma coleção somente leitura contendo todas as instâncias de <see cref="HealthUnit"/> persistidas.
+        /// </returns>
+        Task<IReadOnlyList<HealthUnit>> GetAllAsync();
     }
 }

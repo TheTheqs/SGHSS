@@ -2,38 +2,37 @@
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SGHSS.Application.UseCases.Common;
 using SGHSS.Application.UseCases.LogActivities.Register;
+using SGHSS.Application.UseCases.Professionals.Read;
 using SGHSS.Application.UseCases.Professionals.Register;
 using SGHSS.Domain.Enums;
 
 namespace SGHSS.Interface.Controllers
 {
     /// <summary>
-    /// Controlador responsável por registrar novos profissionais no sistema.
-    /// Apenas Administradores com nível de acesso básico ou superior
-    /// possuem permissão para acessar este endpoint.
+    /// Controlador responsável por operações relacionadas a profissionais,
+    /// incluindo registro e consulta geral. Requer permissões administrativas
+    /// com nível Patient (0) ou superior.
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     public class ProfessionalsController : BaseApiController
     {
         private readonly RegisterProfessionalUseCase _registerProfessionalUseCase;
+        private readonly GetAllProfessionalsUseCase _getAllProfessionalsUseCase;
 
         /// <summary>
         /// Cria uma nova instância do controlador de profissionais.
         /// </summary>
-        /// <param name="registerProfessionalUseCase">
-        /// Caso de uso responsável por registrar profissionais.
-        /// </param>
-        /// <param name="registerLogActivityUseCase">
-        /// Caso de uso responsável por registrar logs de atividade.
-        /// </param>
         public ProfessionalsController(
             RegisterProfessionalUseCase registerProfessionalUseCase,
+            GetAllProfessionalsUseCase getAllProfessionalsUseCase,
             RegisterLogActivityUseCase registerLogActivityUseCase)
             : base(registerLogActivityUseCase)
         {
             _registerProfessionalUseCase = registerProfessionalUseCase;
+            _getAllProfessionalsUseCase = getAllProfessionalsUseCase;
         }
 
         /// <summary>
@@ -102,6 +101,46 @@ namespace SGHSS.Interface.Controllers
                     result: logResult,
                     healthUnitId: null
                 );
+            }
+        }
+
+        /// <summary>
+        /// Retorna uma lista resumida contendo todos os profissionais cadastrados,
+        /// exibindo apenas ID e Nome. Disponível para Administradores Basic (2) ou superior.
+        /// </summary>
+        [HttpGet("all")]
+        [Authorize]
+        [ProducesResponseType(typeof(GetAllResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<ActionResult<GetAllResponse>> GetAll()
+        {
+            // Apenas Administradores Patient (0) ou superior
+            if (!HasMinimumAccessLevel(AccessLevel.Patient))
+                return Forbid();
+
+            LogResult logResult = LogResult.Success;
+            string logDescription = "Consulta de todos os profissionais realizada com sucesso.";
+            Guid? userId = GetUserId();
+
+            try
+            {
+                var result = await _getAllProfessionalsUseCase.Handle();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                logResult = LogResult.Failure;
+                logDescription = $"Falha ao consultar profissionais: {ex.Message}";
+                throw;
+            }
+            finally
+            {
+                await RegistrarLogAsync(
+                    userId,
+                    action: "Professionals.GetAll",
+                    description: logDescription,
+                    result: logResult,
+                    healthUnitId: null);
             }
         }
     }

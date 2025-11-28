@@ -73,5 +73,13 @@ namespace SGHSS.Application.Interfaces.Repositories
         /// </summary>
         /// <param name="patient">Instância de <see cref="Patient"/> a ser persistida.</param>
         Task AddAsync(Patient patient);
+
+        /// <summary>
+        /// Recupera todos os pacientes cadastrados.
+        /// </summary>
+        /// <returns>
+        /// Uma coleção somente leitura contendo todas as instâncias de <see cref="Patient"/> persistidas.
+        /// </returns>
+        Task<IReadOnlyList<Patient>> GetAllAsync();
     }
 }

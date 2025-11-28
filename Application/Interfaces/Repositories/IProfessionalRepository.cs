@@ -78,5 +78,14 @@ namespace SGHSS.Application.Interfaces.Repositories
         /// a chamada ao método de persistência.
         /// </remarks>
         Task UpdateAsync(Professional professional);
+
+        
+        /// <summary>
+        /// Recupera todos os profissionais cadastrados.
+        /// </summary>
+        /// <returns>
+        /// Uma coleção somente leitura contendo todas as instâncias de <see cref="Professional"/> persistidas.
+        /// </returns>
+        Task<IReadOnlyList<Professional>> GetAllAsync();
     }
 }

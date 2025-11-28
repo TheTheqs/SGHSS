@@ -50,6 +50,20 @@ namespace SGHSS.Interface.Middlewares
                     message = argEx.Message;
                     break;
 
+
+                case InvalidOperationException invalidOpEx
+                    when invalidOpEx.Message.StartsWith("Unable to resolve service for type"):
+                    // Erro de configuração de DI (serviço não registrado)
+                    statusCode = (int)HttpStatusCode.InternalServerError;
+                    message = "Erro interno de configuração de serviços. Contate o administrador do sistema.";
+
+                    _logger.LogError(
+                        invalidOpEx,
+                        "Falha ao resolver dependência durante a criação de um controlador ou serviço. Mensagem: {ErrorMessage}",
+                        invalidOpEx.Message
+                    );
+                    break;
+
                 case DbUpdateException dbEx
                     when dbEx.InnerException is PostgresException pgEx
                          && pgEx.SqlState == "22001":
