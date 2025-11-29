@@ -1,6 +1,7 @@
 ﻿// Application/UseCases/Administrators/Read/ConsultHealthUnitBedsUseCase.cs
 
 using SGHSS.Application.Interfaces.Repositories;
+using SGHSS.Application.UseCases.Common;
 using SGHSS.Domain.Enums;
 using SGHSS.Domain.Models;
 
@@ -48,9 +49,17 @@ namespace SGHSS.Application.UseCases.Administrators.Read
             if (request.Status.HasValue)
                 beds = beds.Where(b => b.Status == request.Status.Value);
 
-            var resultBeds = beds.ToList();
+            var bedDtos = unit.Beds
+                .Select(b => new BedDto
+                {
+                    BedId = b.Id,
+                    BedNumber = b.BedNumber,
+                    Type = b.Type,
+                    Status = b.Status
+                })
+                .ToList();
 
-            return new ConsultHealthUnitBedsResponse(request.HealthUnitId, resultBeds);
+            return new ConsultHealthUnitBedsResponse(request.HealthUnitId, bedDtos);
         }
     }
 }

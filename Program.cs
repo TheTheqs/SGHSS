@@ -108,6 +108,7 @@ builder.Services.AddScoped<GetAllPatientsUseCase>();
 builder.Services.AddScoped<GetAllProfessionalsUseCase>();
 builder.Services.AddScoped<GetAllHealthUnitsUseCase>();
 builder.Services.AddScoped<ManageBedsUseCase>();
+builder.Services.AddScoped<ConsultHealthUnitBedsUseCase>();
 
 // =====================
 //  AUTENTICAÇÃO JWT

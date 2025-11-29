@@ -23,6 +23,7 @@ namespace SGHSS.Interface.Controllers
         private readonly RegisterHealthUnitUseCase _registerHealthUnitUseCase;
         private readonly ManageBedsUseCase _manageBedsUseCase;
         private readonly GetAllHealthUnitsUseCase _getAllHealthUnitsUseCase;
+        private readonly ConsultHealthUnitBedsUseCase _consultHealthUnitBedsUseCase;
 
         /// <summary>
         /// Instancia um novo controlador de unidades de saúde.
@@ -30,17 +31,20 @@ namespace SGHSS.Interface.Controllers
         /// <param name="registerHealthUnitUseCase">Caso de uso de registro de unidade.</param>
         /// <param name="manageBedsUseCase">Caso de uso de gerenciamento de leitos da unidade.</param>
         /// <param name="getAllHealthUnitsUseCase">Caso de uso de listagem simplificada de unidades de saúde.</param>
+        /// <param name="consultHealthUnitBedsUseCase">Caso de uso de consulta de leitos de uma unidade.</param>
         /// <param name="registerLogActivityUseCase">Caso de uso de registro de log.</param>
         public HealthUnitsController(
             RegisterHealthUnitUseCase registerHealthUnitUseCase,
             ManageBedsUseCase manageBedsUseCase,
             GetAllHealthUnitsUseCase getAllHealthUnitsUseCase,
+            ConsultHealthUnitBedsUseCase consultHealthUnitBedsUseCase,
             RegisterLogActivityUseCase registerLogActivityUseCase)
             : base(registerLogActivityUseCase)
         {
             _registerHealthUnitUseCase = registerHealthUnitUseCase;
             _manageBedsUseCase = manageBedsUseCase;
             _getAllHealthUnitsUseCase = getAllHealthUnitsUseCase;
+            _consultHealthUnitBedsUseCase = consultHealthUnitBedsUseCase;
         }
 
         /// <summary>
@@ -176,6 +180,78 @@ namespace SGHSS.Interface.Controllers
                 await RegistrarLogAsync(
                     userId,
                     action: "HealthUnits.ManageBeds",
+                    description: logDescription,
+                    result: logResult,
+                    healthUnitId: request.HealthUnitId
+                );
+            }
+        }
+
+        /// <summary>
+        /// Consulta os leitos de uma unidade de saúde, permitindo filtragem opcional
+        /// por tipo e status de leito.
+        /// Requer um Administrador autenticado com nível Basic ou superior.
+        /// </summary>
+        /// <param name="request">
+        /// Dados da consulta, incluindo o identificador da unidade de saúde e filtros opcionais.
+        /// </param>
+        /// <returns>
+        /// Um <see cref="ConsultHealthUnitBedsResponse"/> contendo a lista de leitos
+        /// da unidade após aplicação dos filtros.
+        /// </returns>
+        [HttpGet("beds")]
+        [Authorize]
+        [ProducesResponseType(typeof(ConsultHealthUnitBedsResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<ActionResult<ConsultHealthUnitBedsResponse>> ConsultBeds(
+            [FromQuery] ConsultHealthUnitBedsRequest request)
+        {
+            if (!HasMinimumAccessLevel(AccessLevel.Basic))
+            {
+                return Forbid();
+            }
+
+            LogResult logResult = LogResult.Success;
+            string logDescription = "Consulta de leitos da unidade realizada com sucesso.";
+            Guid? userId = GetUserId();
+
+            try
+            {
+                var response = await _consultHealthUnitBedsUseCase.Handle(request);
+                return Ok(response);
+            }
+            catch (ArgumentException ex)
+            {
+                logResult = LogResult.Failure;
+                logDescription = $"Falha ao consultar leitos da unidade: {ex.Message}";
+
+                return BadRequest(new
+                {
+                    error = ex.Message
+                });
+            }
+            catch (InvalidOperationException ex)
+            {
+                logResult = LogResult.Failure;
+                logDescription = $"Falha ao consultar leitos da unidade: {ex.Message}";
+
+                return BadRequest(new
+                {
+                    error = ex.Message
+                });
+            }
+            catch (Exception)
+            {
+                logResult = LogResult.Failure;
+                logDescription = "Erro inesperado ao consultar leitos da unidade.";
+                throw;
+            }
+            finally
+            {
+                await RegistrarLogAsync(
+                    userId,
+                    action: "HealthUnits.ConsultBeds",
                     description: logDescription,
                     result: logResult,
                     healthUnitId: request.HealthUnitId
