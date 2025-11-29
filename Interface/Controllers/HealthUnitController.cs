@@ -24,6 +24,8 @@ namespace SGHSS.Interface.Controllers
         private readonly ManageBedsUseCase _manageBedsUseCase;
         private readonly GetAllHealthUnitsUseCase _getAllHealthUnitsUseCase;
         private readonly ConsultHealthUnitBedsUseCase _consultHealthUnitBedsUseCase;
+        private readonly MakeBedAsUnderMaintenanceUseCase _makeBedAsUnderMaintenanceUseCase;
+        private readonly MakeBedAsAvailableUseCase _makeBedAsAvailableUseCase;
 
         /// <summary>
         /// Instancia um novo controlador de unidades de saúde.
@@ -33,18 +35,24 @@ namespace SGHSS.Interface.Controllers
         /// <param name="getAllHealthUnitsUseCase">Caso de uso de listagem simplificada de unidades de saúde.</param>
         /// <param name="consultHealthUnitBedsUseCase">Caso de uso de consulta de leitos de uma unidade.</param>
         /// <param name="registerLogActivityUseCase">Caso de uso de registro de log.</param>
+        /// <param name="makeBedAsAvailableUseCase">Caso de uso para marcar uma cama como livre novamente.</param>
+        /// <param name="makeBedAsUnderMaintenanceUseCase">Caso de uso que coloca uma cama em manutenção.</param>
         public HealthUnitsController(
             RegisterHealthUnitUseCase registerHealthUnitUseCase,
             ManageBedsUseCase manageBedsUseCase,
             GetAllHealthUnitsUseCase getAllHealthUnitsUseCase,
             ConsultHealthUnitBedsUseCase consultHealthUnitBedsUseCase,
-            RegisterLogActivityUseCase registerLogActivityUseCase)
-            : base(registerLogActivityUseCase)
+            MakeBedAsUnderMaintenanceUseCase makeBedAsUnderMaintenanceUseCase,
+            MakeBedAsAvailableUseCase makeBedAsAvailableUseCase,
+            RegisterLogActivityUseCase registerLogActivityUseCase
+        ) : base(registerLogActivityUseCase)
         {
             _registerHealthUnitUseCase = registerHealthUnitUseCase;
             _manageBedsUseCase = manageBedsUseCase;
             _getAllHealthUnitsUseCase = getAllHealthUnitsUseCase;
             _consultHealthUnitBedsUseCase = consultHealthUnitBedsUseCase;
+            _makeBedAsUnderMaintenanceUseCase = makeBedAsUnderMaintenanceUseCase;
+            _makeBedAsAvailableUseCase = makeBedAsAvailableUseCase;
         }
 
         /// <summary>
@@ -297,6 +305,134 @@ namespace SGHSS.Interface.Controllers
                 await RegistrarLogAsync(
                     userId,
                     action: "HealthUnits.GetAll",
+                    description: logDescription,
+                    result: logResult,
+                    healthUnitId: null
+                );
+            }
+        }
+
+        /// <summary>
+        /// Define uma cama como "em manutenção", tornando-a temporariamente indisponível
+        /// para internações, reservas ou qualquer operação clínica.
+        /// </summary>
+        /// <remarks>
+        /// Apenas Administradores com nível de acesso <see cref="AccessLevel.Basic"/> ou superior
+        /// podem executar esta operação.
+        ///
+        /// A cama só pode ser colocada em manutenção quando estiver no estado
+        /// <see cref="BedStatus.Available"/>. Caso esteja ocupada, reservada ou já em manutenção,
+        /// uma exceção é lançada.
+        /// </remarks>
+        /// <param name="bedId">Identificador único da cama a ser modificada.</param>
+        /// <returns>Retorna <c>NoContent</c> quando a operação ocorre com sucesso.</returns>
+        [HttpPatch("beds/{bedId:guid}/maintenance")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> SetBedUnderMaintenance(Guid bedId)
+        {
+            if (!HasMinimumAccessLevel(AccessLevel.Basic))
+                return Forbid();
+
+            LogResult logResult = LogResult.Success;
+            string logDescription = "Cama marcada como em manutenção.";
+            Guid? userId = GetUserId();
+
+            try
+            {
+                await _makeBedAsUnderMaintenanceUseCase.Handle(bedId);
+                return NoContent();
+            }
+            catch (KeyNotFoundException ex)
+            {
+                logResult = LogResult.Failure;
+                logDescription = ex.Message;
+                return NotFound(new { error = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                logResult = LogResult.Failure;
+                logDescription = ex.Message;
+                return BadRequest(new { error = ex.Message });
+            }
+            catch (Exception)
+            {
+                logResult = LogResult.Failure;
+                logDescription = "Erro inesperado ao colocar cama em manutenção.";
+                throw;
+            }
+            finally
+            {
+                await RegistrarLogAsync(
+                    userId,
+                    action: "HealthUnits.SetBedUnderMaintenance",
+                    description: logDescription,
+                    result: logResult,
+                    healthUnitId: null
+                );
+            }
+        }
+
+        /// <summary>
+        /// Marca uma cama como "disponível" novamente, removendo o estado de manutenção
+        /// e permitindo que ela volte ao uso normal na unidade.
+        /// </summary>
+        /// <remarks>
+        /// Apenas Administradores com nível de acesso <see cref="AccessLevel.Basic"/> ou superior
+        /// podem executar esta operação.
+        ///
+        /// A cama somente pode voltar a ficar disponível caso esteja no estado
+        /// <see cref="BedStatus.UnderMaintenance"/>. Se estiver em qualquer outro estado,
+        /// uma exceção é lançada para impedir inconsistências.
+        /// </remarks>
+        /// <param name="bedId">Identificador único da cama que será alterada.</param>
+        /// <returns>Retorna <c>NoContent</c> quando a operação ocorre com sucesso.</returns>
+        [HttpPatch("beds/{bedId:guid}/available")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> SetBedAvailable(Guid bedId)
+        {
+            if (!HasMinimumAccessLevel(AccessLevel.Basic))
+                return Forbid();
+
+            LogResult logResult = LogResult.Success;
+            string logDescription = "Cama marcada como disponível.";
+            Guid? userId = GetUserId();
+
+            try
+            {
+                await _makeBedAsAvailableUseCase.Handle(bedId);
+                return NoContent();
+            }
+            catch (KeyNotFoundException ex)
+            {
+                logResult = LogResult.Failure;
+                logDescription = ex.Message;
+                return NotFound(new { error = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                logResult = LogResult.Failure;
+                logDescription = ex.Message;
+                return BadRequest(new { error = ex.Message });
+            }
+            catch (Exception)
+            {
+                logResult = LogResult.Failure;
+                logDescription = "Erro inesperado ao marcar cama como disponível.";
+                throw;
+            }
+            finally
+            {
+                await RegistrarLogAsync(
+                    userId,
+                    action: "HealthUnits.SetBedAvailable",
                     description: logDescription,
                     result: logResult,
                     healthUnitId: null

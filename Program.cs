@@ -92,6 +92,7 @@ builder.Services.AddScoped<IAuditReportRepository, AuditReportRepository>();
 builder.Services.AddScoped<IPatientRepository, PatientRepository>();
 builder.Services.AddScoped<IProfessionalRepository, ProfessionalRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IBedRepository, BedRepository>();
 
 // UseCases
 builder.Services.AddScoped<EnsureDefaultSuperAdministratorUseCase>();
@@ -109,6 +110,8 @@ builder.Services.AddScoped<GetAllProfessionalsUseCase>();
 builder.Services.AddScoped<GetAllHealthUnitsUseCase>();
 builder.Services.AddScoped<ManageBedsUseCase>();
 builder.Services.AddScoped<ConsultHealthUnitBedsUseCase>();
+builder.Services.AddScoped<MakeBedAsAvailableUseCase>();
+builder.Services.AddScoped<MakeBedAsUnderMaintenanceUseCase>();
 
 // =====================
 //  AUTENTICAÇÃO JWT
