@@ -34,7 +34,7 @@ namespace SGHSS.Infra.Persistence.Migrations
 
                     b.HasIndex("PatientsId");
 
-                    b.ToTable("HealthUnitPatient");
+                    b.ToTable("HealthUnitPatient", (string)null);
                 });
 
             modelBuilder.Entity("HealthUnitProfessional", b =>
@@ -49,7 +49,7 @@ namespace SGHSS.Infra.Persistence.Migrations
 
                     b.HasIndex("ProfessionalsId");
 
-                    b.ToTable("HealthUnitProfessional");
+                    b.ToTable("HealthUnitProfessional", (string)null);
                 });
 
             modelBuilder.Entity("SGHSS.Domain.Models.Appointment", b =>

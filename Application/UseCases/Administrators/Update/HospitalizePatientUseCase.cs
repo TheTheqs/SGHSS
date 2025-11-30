@@ -25,18 +25,22 @@ namespace SGHSS.Application.UseCases.Administrators.Update
     {
         private readonly IPatientRepository _patientRepository;
         private readonly IBedRepository _bedRepository;
+        private readonly IHospitalizationRepository _hospitalizationRepository;
 
         /// <summary>
         /// Cria uma nova instância do caso de uso de hospitalização de paciente.
         /// </summary>
-        /// <param name="patientRepository">Repositório de pacientes utilizado para carregar e persistir o agregado.</param>
+        /// <param name="patientRepository">Repositório de pacientes utilizado para carregar o agregado.</param>
         /// <param name="bedRepository">Repositório de camas utilizado para recuperar e atualizar o leito associado.</param>
+        /// <param name="hospitalizationRepository">Repositório de internações utilizado para persistir o registro de hospitalização.</param>
         public HospitalizePatientUseCase(
             IPatientRepository patientRepository,
-            IBedRepository bedRepository)
+            IBedRepository bedRepository,
+            IHospitalizationRepository hospitalizationRepository)
         {
             _patientRepository = patientRepository;
             _bedRepository = bedRepository;
+            _hospitalizationRepository = hospitalizationRepository;
         }
 
         /// <summary>
@@ -79,28 +83,27 @@ namespace SGHSS.Application.UseCases.Administrators.Update
             if (hasActiveHospitalization)
                 throw new InvalidOperationException("O paciente já possui uma internação ativa.");
 
-            // Cria a entidade de internação.
+            // Cria a entidade de internação com todas as associações.
             var hospitalization = new Hospitalization
             {
                 AdmissionDate = DateTimeOffset.UtcNow,
-                DischargeDate = null, // explicitamente sem alta
+                DischargeDate = null,
                 Reason = request.Reason,
                 Status = HospitalizationStatus.Admitted,
+                Patient = patient,
                 Bed = bed
             };
 
-            // Associa a internação ao paciente.
+            // Mantém a associação no agregado em memória.
             patient.Hospitalizations.Add(hospitalization);
 
             // Atualiza o status da cama para ocupada.
             bed.Status = BedStatus.Occupied;
 
-            // Persistência das mudanças.
-            await _patientRepository.UpdateAsync(patient);
+            // Persistência das mudanças:
+            await _hospitalizationRepository.AddAsync(hospitalization);
             await _bedRepository.UpdateAsync(bed);
-
-            // TODO: Registrar atualização no prontuário (MedicalRecordUpdate)
-            // associada a esta internação, vinculando o evento ao histórico clínico.
+            await _patientRepository.UpdateAsync(patient);
 
             return new HospitalizePatientResponse(
                 hospitalizationId: hospitalization.Id,

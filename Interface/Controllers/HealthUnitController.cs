@@ -215,7 +215,7 @@ namespace SGHSS.Interface.Controllers
         public async Task<ActionResult<ConsultHealthUnitBedsResponse>> ConsultBeds(
             [FromQuery] ConsultHealthUnitBedsRequest request)
         {
-            if (!HasMinimumAccessLevel(AccessLevel.Basic))
+            if (!HasMinimumAccessLevel(AccessLevel.Professional))
             {
                 return Forbid();
             }
@@ -280,7 +280,7 @@ namespace SGHSS.Interface.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<GetAllResponse>> GetAll()
         {
-            if (!HasMinimumAccessLevel(AccessLevel.Basic))
+            if (!HasMinimumAccessLevel(AccessLevel.Professional))
             {
                 return Forbid();
             }

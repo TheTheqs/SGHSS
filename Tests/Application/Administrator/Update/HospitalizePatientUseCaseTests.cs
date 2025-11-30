@@ -7,10 +7,8 @@ using SGHSS.Application.UseCases.Common;
 using SGHSS.Application.UseCases.Patients.Register;
 using SGHSS.Domain.Enums;
 using SGHSS.Domain.Models;
-using SGHSS.Domain.ValueObjects;
 using SGHSS.Infra.Repositories;
 using SGHSS.Tests.Infra;
-using SGHSS.Tests.TestData.Common;
 using SGHSS.Tests.TestData.Models;
 using SGHSS.Tests.TestData.Models.SGHSS.Tests.TestData.Common;
 using SGHSS.Tests.TestData.Models.SGHSS.Tests.TestData.Patients;
@@ -76,6 +74,7 @@ namespace SGHSS.Tests.Application.Administrator.Update
             var patientRepository = new PatientRepository(context);
             var bedRepository = new BedRepository(context);
             var healthUnitRepository = new HealthUnitRepository(context);
+            var hospitalizationRepository = new HospitalizationRepository(context);
 
             Guid patientId = await CreatePatientAsync(patientRepository);
             Guid bedId = await CreateHealthUnitWithSingleBedAsync(healthUnitRepository, BedStatus.Available);
@@ -85,7 +84,7 @@ namespace SGHSS.Tests.Application.Administrator.Update
                 bedId: bedId
             );
 
-            var useCase = new HospitalizePatientUseCase(patientRepository, bedRepository);
+            var useCase = new HospitalizePatientUseCase(patientRepository, bedRepository, hospitalizationRepository);
 
             // Act
             var response = await useCase.Handle(request);
@@ -123,6 +122,7 @@ namespace SGHSS.Tests.Application.Administrator.Update
             using var context = DbContextTestFactory.CreateInMemoryContext();
             var patientRepository = new PatientRepository(context);
             var bedRepository = new BedRepository(context);
+            var hospitalizationRepository = new HospitalizationRepository(context);
             var healthUnitRepository = new HealthUnitRepository(context);
 
             // Criamos um leito válido só para garantir cenário realista
@@ -133,7 +133,7 @@ namespace SGHSS.Tests.Application.Administrator.Update
                 bedId: bedId
             );
 
-            var useCase = new HospitalizePatientUseCase(patientRepository, bedRepository);
+            var useCase = new HospitalizePatientUseCase(patientRepository, bedRepository, hospitalizationRepository);
 
             // Act
             Func<Task> act = () => useCase.Handle(request);
@@ -151,6 +151,7 @@ namespace SGHSS.Tests.Application.Administrator.Update
             using var context = DbContextTestFactory.CreateInMemoryContext();
             var patientRepository = new PatientRepository(context);
             var bedRepository = new BedRepository(context);
+            var hospitalizationRepository = new HospitalizationRepository(context);
 
             Guid patientId = await CreatePatientAsync(patientRepository);
 
@@ -159,7 +160,7 @@ namespace SGHSS.Tests.Application.Administrator.Update
                 bedId: Guid.NewGuid() // cama inexistente
             );
 
-            var useCase = new HospitalizePatientUseCase(patientRepository, bedRepository);
+            var useCase = new HospitalizePatientUseCase(patientRepository, bedRepository, hospitalizationRepository);
 
             // Act
             Func<Task> act = () => useCase.Handle(request);
@@ -177,6 +178,7 @@ namespace SGHSS.Tests.Application.Administrator.Update
             using var context = DbContextTestFactory.CreateInMemoryContext();
             var patientRepository = new PatientRepository(context);
             var bedRepository = new BedRepository(context);
+            var hospitalizationRepository = new HospitalizationRepository(context);
             var healthUnitRepository = new HealthUnitRepository(context);
 
             Guid patientId = await CreatePatientAsync(patientRepository);
@@ -187,7 +189,7 @@ namespace SGHSS.Tests.Application.Administrator.Update
                 bedId: bedId
             );
 
-            var useCase = new HospitalizePatientUseCase(patientRepository, bedRepository);
+            var useCase = new HospitalizePatientUseCase(patientRepository, bedRepository, hospitalizationRepository);
 
             // Act
             Func<Task> act = () => useCase.Handle(request);
@@ -213,6 +215,7 @@ namespace SGHSS.Tests.Application.Administrator.Update
             using var context = DbContextTestFactory.CreateInMemoryContext();
             var patientRepository = new PatientRepository(context);
             var bedRepository = new BedRepository(context);
+            var hospitalizationRepository = new HospitalizationRepository(context);
             var healthUnitRepository = new HealthUnitRepository(context);
 
             Guid patientId = await CreatePatientAsync(patientRepository);
@@ -267,7 +270,7 @@ namespace SGHSS.Tests.Application.Administrator.Update
                 bedId: candidateBed.Id
             );
 
-            var useCase = new HospitalizePatientUseCase(patientRepository, bedRepository);
+            var useCase = new HospitalizePatientUseCase(patientRepository, bedRepository, hospitalizationRepository);
 
             // Act
             Func<Task> act = () => useCase.Handle(request);

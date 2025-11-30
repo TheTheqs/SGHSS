@@ -45,6 +45,7 @@ namespace SGHSS.Infra.Repositories
         {
             return await _context.Patients
                 .Include(p => p.Hospitalizations)
+                    .ThenInclude(h => h.Bed)
                 .Include(p => p.MedicalRecord)
                     .ThenInclude(mr => mr.Updates)
                 .FirstOrDefaultAsync(p => p.Id == patientId);

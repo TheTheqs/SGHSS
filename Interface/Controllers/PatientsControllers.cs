@@ -23,6 +23,7 @@ namespace SGHSS.Interface.Controllers
         private readonly RegisterPatientUseCase _registerPatientUseCase;
         private readonly GetAllPatientsUseCase _getAllPatientsUseCase;
         private readonly HospitalizePatientUseCase _hospitalizePatientUseCase;
+        private readonly DischargePatientUseCase _dischargePatientUseCase;
 
         /// <summary>
         /// Instancia um novo controlador de pacientes,
@@ -31,13 +32,15 @@ namespace SGHSS.Interface.Controllers
         public PatientsController(
             RegisterPatientUseCase registerPatientUseCase,
             GetAllPatientsUseCase getAllPatientsUseCase,
-            RegisterLogActivityUseCase registerLogActivityUseCase,
-            HospitalizePatientUseCase hospitalizePatientUseCase)
+            HospitalizePatientUseCase hospitalizePatientUseCase,
+            DischargePatientUseCase dischargePatientUseCase,
+            RegisterLogActivityUseCase registerLogActivityUseCase)
             : base(registerLogActivityUseCase)
         {
             _registerPatientUseCase = registerPatientUseCase;
             _getAllPatientsUseCase = getAllPatientsUseCase;
             _hospitalizePatientUseCase = hospitalizePatientUseCase;
+            _dischargePatientUseCase = dischargePatientUseCase;
         }
 
         /// <summary>
@@ -207,6 +210,69 @@ namespace SGHSS.Interface.Controllers
                 await RegistrarLogAsync(
                     userId,
                     action: "Patients.Hospitalize",
+                    description: logDescription,
+                    result: logResult,
+                    healthUnitId: null
+                );
+            }
+        }
+
+        /// <summary>
+        /// Realiza a alta de um paciente, encerrando a internação ativa
+        /// e liberando o leito associado.
+        /// </summary>
+        /// <param name="patientId">Identificador do paciente que receberá alta.</param>
+        [HttpPost("{patientId:guid}/discharge")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Discharge(Guid patientId)
+        {
+            // 🔒 Regra: EXATAMENTE AccessLevel.Professional
+            var accessLevelClaim = User.FindFirst("access_level")?.Value;
+
+            if (!Enum.TryParse(accessLevelClaim, out AccessLevel userAccessLevel) ||
+                userAccessLevel != AccessLevel.Professional)
+            {
+                return Forbid();
+            }
+
+            LogResult logResult = LogResult.Success;
+            string logDescription = "Alta de paciente realizada com sucesso.";
+            Guid? userId = GetUserId();
+
+            try
+            {
+                await _dischargePatientUseCase.Handle(patientId);
+                return NoContent();
+            }
+            catch (KeyNotFoundException ex)
+            {
+                logResult = LogResult.Failure;
+                logDescription = $"Falha ao realizar alta: {ex.Message}";
+
+                return NotFound(new { error = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                logResult = LogResult.Failure;
+                logDescription = $"Falha ao realizar alta: {ex.Message}";
+
+                return BadRequest(new { error = ex.Message });
+            }
+            catch (Exception)
+            {
+                logResult = LogResult.Failure;
+                logDescription = "Erro inesperado ao realizar alta.";
+                throw;
+            }
+            finally
+            {
+                await RegistrarLogAsync(
+                    userId,
+                    action: "Patients.Discharge",
                     description: logDescription,
                     result: logResult,
                     healthUnitId: null
