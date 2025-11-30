@@ -2,6 +2,7 @@
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SGHSS.Application.UseCases.Administrators.Update;
 using SGHSS.Application.UseCases.Common;
 using SGHSS.Application.UseCases.LogActivities.Register;
 using SGHSS.Application.UseCases.Patients.Read;
@@ -21,19 +22,22 @@ namespace SGHSS.Interface.Controllers
     {
         private readonly RegisterPatientUseCase _registerPatientUseCase;
         private readonly GetAllPatientsUseCase _getAllPatientsUseCase;
+        private readonly HospitalizePatientUseCase _hospitalizePatientUseCase;
 
         /// <summary>
         /// Instancia um novo controlador de pacientes,
-        /// habilitando registro e listagem de pacientes.
+        /// habilitando registro, listagem de pacientes e gerenciamento de hospitalização.
         /// </summary>
         public PatientsController(
             RegisterPatientUseCase registerPatientUseCase,
             GetAllPatientsUseCase getAllPatientsUseCase,
-            RegisterLogActivityUseCase registerLogActivityUseCase)
+            RegisterLogActivityUseCase registerLogActivityUseCase,
+            HospitalizePatientUseCase hospitalizePatientUseCase)
             : base(registerLogActivityUseCase)
         {
             _registerPatientUseCase = registerPatientUseCase;
             _getAllPatientsUseCase = getAllPatientsUseCase;
+            _hospitalizePatientUseCase = hospitalizePatientUseCase;
         }
 
         /// <summary>
@@ -138,6 +142,71 @@ namespace SGHSS.Interface.Controllers
                 await RegistrarLogAsync(
                     userId,
                     action: "Patients.GetAll",
+                    description: logDescription,
+                    result: logResult,
+                    healthUnitId: null
+                );
+            }
+        }
+
+        /// <summary>
+        /// Hospitaliza um paciente vinculando-o a uma cama disponível.
+        /// Apenas profissionais (AccessLevel.Professional) podem executar esta ação.
+        /// </summary>
+        /// <param name="request">Informações necessárias para hospitalizar o paciente.</param>
+        /// <returns>Um <see cref="HospitalizePatientResponse"/> contendo detalhes da internação.</returns>
+        [HttpPost("hospitalize")]
+        [Authorize]
+        [ProducesResponseType(typeof(HospitalizePatientResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<ActionResult<HospitalizePatientResponse>> Hospitalize(
+            [FromBody] HospitalizePatientRequest request)
+        {
+            // 🔒 Regra: EXATAMENTE AccessLevel.Professional
+            var accessLevelClaim = User.FindFirst("access_level")?.Value;
+
+            if (!Enum.TryParse(accessLevelClaim, out AccessLevel userAccessLevel) ||
+                userAccessLevel != AccessLevel.Professional)
+            {
+                return Forbid();
+            }
+
+            LogResult logResult = LogResult.Success;
+            string logDescription = "Paciente hospitalizado com sucesso.";
+            Guid? userId = GetUserId();
+
+            try
+            {
+                var response = await _hospitalizePatientUseCase.Handle(request);
+                return Ok(response);
+            }
+            catch (ArgumentException ex)
+            {
+                logResult = LogResult.Failure;
+                logDescription = $"Falha ao hospitalizar paciente: {ex.Message}";
+
+                return BadRequest(new { error = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                logResult = LogResult.Failure;
+                logDescription = $"Falha ao hospitalizar paciente: {ex.Message}";
+
+                return BadRequest(new { error = ex.Message });
+            }
+            catch (Exception)
+            {
+                logResult = LogResult.Failure;
+                logDescription = "Erro inesperado ao hospitalizar paciente.";
+                throw;
+            }
+            finally
+            {
+                // Dá pra usar request.BedId depois quando quiser registrar a unidade
+                await RegistrarLogAsync(
+                    userId,
+                    action: "Patients.Hospitalize",
                     description: logDescription,
                     result: logResult,
                     healthUnitId: null
