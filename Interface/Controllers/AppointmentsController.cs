@@ -2,16 +2,19 @@
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SGHSS.Application.UseCases.Appointments;
+using SGHSS.Application.UseCases.Appointments.GetLink;
 using SGHSS.Application.UseCases.Appointments.Read;
 using SGHSS.Application.UseCases.Appointments.Register;
 using SGHSS.Application.UseCases.LogActivities.Register;
 using SGHSS.Domain.Enums;
+using SGHSS.Domain.Models;
 
 namespace SGHSS.Interface.Controllers
 {
     /// <summary>
     /// Controlador responsável por operações relacionadas a consultas (appointments),
-    /// incluindo agendamento e consulta de histórico de consultas de pacientes.
+    /// incluindo agendamento, consulta de histórico e acesso a links de teleconsulta.
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
@@ -19,6 +22,7 @@ namespace SGHSS.Interface.Controllers
     {
         private readonly ScheduleAppointmentUseCase _scheduleAppointmentUseCase;
         private readonly GetPatientAppointmentsUseCase _getPatientAppointmentsUseCase;
+        private readonly GetAppointmentLinkUseCase _getAppointmentLinkUseCase;
 
         /// <summary>
         /// Cria uma nova instância do controlador de consultas.
@@ -29,17 +33,22 @@ namespace SGHSS.Interface.Controllers
         /// <param name="getPatientAppointmentsUseCase">
         /// Caso de uso responsável por consultar o histórico de consultas de um paciente.
         /// </param>
+        /// <param name="getAppointmentLinkUseCase">
+        /// Caso de uso responsável por consultar o link de teleconsulta de uma consulta específica.
+        /// </param>
         /// <param name="registerLogActivityUseCase">
         /// Caso de uso responsável por registrar logs de atividade.
         /// </param>
         public AppointmentsController(
             ScheduleAppointmentUseCase scheduleAppointmentUseCase,
             GetPatientAppointmentsUseCase getPatientAppointmentsUseCase,
+            GetAppointmentLinkUseCase getAppointmentLinkUseCase,
             RegisterLogActivityUseCase registerLogActivityUseCase)
             : base(registerLogActivityUseCase)
         {
             _scheduleAppointmentUseCase = scheduleAppointmentUseCase;
             _getPatientAppointmentsUseCase = getPatientAppointmentsUseCase;
+            _getAppointmentLinkUseCase = getAppointmentLinkUseCase;
         }
 
         /// <summary>
@@ -196,6 +205,98 @@ namespace SGHSS.Interface.Controllers
                 await RegistrarLogAsync(
                     userId,
                     action: "Appointments.GetByPatient",
+                    description: logDescription,
+                    result: logResult,
+                    healthUnitId: null
+                );
+            }
+        }
+
+        /// <summary>
+        /// Retorna o link (URL) de teleconsulta associado a um agendamento específico.
+        /// </summary>
+        /// <remarks>
+        /// Regra de autorização:
+        /// <list type="bullet">
+        /// <item>Qualquer usuário autenticado com nível de acesso <see cref="AccessLevel.Patient"/> ou superior pode acessar;</item>
+        /// <item>A validação fina de permissão (se o usuário pode ou não ver o link daquele agendamento)
+        /// deve ser complementada via políticas adicionais ou em middleware, conforme necessidade.</item>
+        /// </list>
+        /// </remarks>
+        /// <param name="appointmentId">Identificador do agendamento cuja URL de teleconsulta será recuperada.</param>
+        /// <returns>
+        /// Um <see cref="GetAppointmentLinkResponse"/> contendo a URL da teleconsulta em formato de string.
+        /// </returns>
+        [HttpGet("{appointmentId:guid}/link")]
+        [Authorize]
+        [ProducesResponseType(typeof(GetAppointmentLinkResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<GetAppointmentLinkResponse>> GetAppointmentLink(
+            [FromRoute] Guid appointmentId)
+        {
+            var accessLevel = GetUserAccessLevel();
+            var userId = GetUserId();
+
+            // Sem nível de acesso válido → acesso negado
+            if (accessLevel is null || accessLevel.Value < AccessLevel.Patient)
+                return Forbid();
+
+            // Se for exatamente Patient, só pode consultar o link de suas próprias consultas.
+            if (accessLevel.Value == AccessLevel.Patient)
+            {
+                if (!userId.HasValue || userId.Value != userId)
+                {
+                    return Forbid();
+                }
+            }
+
+            LogResult logResult = LogResult.Success;
+            string logDescription = "Link de teleconsulta recuperado com sucesso.";
+
+            var request = new GetAppointmentLinkRequest
+            {
+                AppointmentId = appointmentId
+            };
+
+            try
+            {
+                var response = await _getAppointmentLinkUseCase.Handle(request);
+                return Ok(response);
+            }
+            catch (ArgumentNullException ex)
+            {
+                logResult = LogResult.Failure;
+                logDescription = $"Falha ao recuperar link de teleconsulta: {ex.Message}";
+
+                return BadRequest(new { error = ex.Message });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                logResult = LogResult.Failure;
+                logDescription = $"Falha ao recuperar link de teleconsulta: {ex.Message}";
+
+                return NotFound(new { error = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                logResult = LogResult.Failure;
+                logDescription = $"Falha ao recuperar link de teleconsulta: {ex.Message}";
+
+                return BadRequest(new { error = ex.Message });
+            }
+            catch (Exception)
+            {
+                logResult = LogResult.Failure;
+                logDescription = "Erro inesperado ao recuperar link de teleconsulta.";
+                throw;
+            }
+            finally
+            {
+                await RegistrarLogAsync(
+                    userId,
+                    action: "Appointments.GetTeleconsultationLink",
                     description: logDescription,
                     result: logResult,
                     healthUnitId: null
