@@ -6,14 +6,15 @@ using SGHSS.Application.UseCases.Common;
 using SGHSS.Application.UseCases.LogActivities.Register;
 using SGHSS.Application.UseCases.Professionals.Read;
 using SGHSS.Application.UseCases.Professionals.Register;
+using SGHSS.Application.UseCases.ProfessionalSchedules.Consult;
 using SGHSS.Domain.Enums;
 
 namespace SGHSS.Interface.Controllers
 {
     /// <summary>
     /// Controlador responsável por operações relacionadas a profissionais,
-    /// incluindo registro e consulta geral. Requer permissões administrativas
-    /// com nível Patient (0) ou superior.
+    /// incluindo registro, consulta geral e verificação de disponibilidade de agenda.
+    /// Requer permissões administrativas com nível Patient (0) ou superior.
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
@@ -21,6 +22,7 @@ namespace SGHSS.Interface.Controllers
     {
         private readonly RegisterProfessionalUseCase _registerProfessionalUseCase;
         private readonly GetAllProfessionalsUseCase _getAllProfessionalsUseCase;
+        private readonly GenerateAvailableSlotsUseCase _generateAvailableSlotsUseCase;
 
         /// <summary>
         /// Cria uma nova instância do controlador de profissionais.
@@ -28,11 +30,13 @@ namespace SGHSS.Interface.Controllers
         public ProfessionalsController(
             RegisterProfessionalUseCase registerProfessionalUseCase,
             GetAllProfessionalsUseCase getAllProfessionalsUseCase,
+            GenerateAvailableSlotsUseCase generateAvailableSlotsUseCase,
             RegisterLogActivityUseCase registerLogActivityUseCase)
             : base(registerLogActivityUseCase)
         {
             _registerProfessionalUseCase = registerProfessionalUseCase;
             _getAllProfessionalsUseCase = getAllProfessionalsUseCase;
+            _generateAvailableSlotsUseCase = generateAvailableSlotsUseCase;
         }
 
         /// <summary>
@@ -106,7 +110,7 @@ namespace SGHSS.Interface.Controllers
 
         /// <summary>
         /// Retorna uma lista resumida contendo todos os profissionais cadastrados,
-        /// exibindo apenas ID e Nome. Disponível para Administradores Basic (2) ou superior.
+        /// exibindo apenas ID e Nome. Disponível para Administradores Patient (0) ou superior.
         /// </summary>
         [HttpGet("all")]
         [Authorize]
@@ -138,6 +142,83 @@ namespace SGHSS.Interface.Controllers
                 await RegistrarLogAsync(
                     userId,
                     action: "Professionals.GetAll",
+                    description: logDescription,
+                    result: logResult,
+                    healthUnitId: null);
+            }
+        }
+
+        /// <summary>
+        /// Consulta e retorna os horários disponíveis na agenda de um profissional
+        /// em um determinado intervalo de tempo.
+        /// </summary>
+        /// <remarks>
+        /// Quando <see cref="GenerateAvailableSlotsRequest.From"/> não é informado,
+        /// o sistema utiliza a data/hora atual como início. Quando
+        /// <see cref="GenerateAvailableSlotsRequest.To"/> não é informada,
+        /// o sistema utiliza um horizonte padrão de dois meses a partir da data inicial.
+        /// 
+        /// Disponível para Administradores com nível Patient (0) ou superior.
+        /// </remarks>
+        /// <param name="request">
+        /// Dados necessários para identificar o profissional e o intervalo de consulta.
+        /// </param>
+        /// <returns>
+        /// Um <see cref="GenerateAvailableSlotsResponse"/> contendo o identificador do profissional
+        /// e a lista de intervalos de horários disponíveis para agendamento.
+        /// </returns>
+        [HttpPost("schedules/available")]
+        [Authorize]
+        [ProducesResponseType(typeof(GenerateAvailableSlotsResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<ActionResult<GenerateAvailableSlotsResponse>> GenerateAvailableSlots(
+            [FromBody] GenerateAvailableSlotsRequest request)
+        {
+            // Apenas Administradores Patient (0) ou superior
+            if (!HasMinimumAccessLevel(AccessLevel.Patient))
+                return Forbid();
+
+            LogResult logResult = LogResult.Success;
+            string logDescription = "Consulta de horários disponíveis realizada com sucesso.";
+            Guid? userId = GetUserId();
+
+            try
+            {
+                var response = await _generateAvailableSlotsUseCase.Handle(request);
+                return Ok(response);
+            }
+            catch (ArgumentNullException ex)
+            {
+                logResult = LogResult.Failure;
+                logDescription = $"Falha ao consultar horários disponíveis: {ex.Message}";
+
+                return BadRequest(new
+                {
+                    error = ex.Message
+                });
+            }
+            catch (InvalidOperationException ex)
+            {
+                logResult = LogResult.Failure;
+                logDescription = $"Falha ao consultar horários disponíveis: {ex.Message}";
+
+                return BadRequest(new
+                {
+                    error = ex.Message
+                });
+            }
+            catch (Exception)
+            {
+                logResult = LogResult.Failure;
+                logDescription = "Erro inesperado ao consultar horários disponíveis.";
+                throw;
+            }
+            finally
+            {
+                await RegistrarLogAsync(
+                    userId,
+                    action: "Professionals.GenerateAvailableSlots",
                     description: logDescription,
                     result: logResult,
                     healthUnitId: null);

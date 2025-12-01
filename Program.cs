@@ -24,6 +24,7 @@ using SGHSS.Application.UseCases.Administrators.Read;
 using SGHSS.Application.UseCases.Patients.Read;
 using SGHSS.Application.UseCases.Professionals.Read;
 using SGHSS.Application.UseCases.Administrators.Update;
+using SGHSS.Application.UseCases.ProfessionalSchedules.Consult;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -94,6 +95,8 @@ builder.Services.AddScoped<IProfessionalRepository, ProfessionalRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IBedRepository, BedRepository>();
 builder.Services.AddScoped<IHospitalizationRepository, HospitalizationRepository>();
+builder.Services.AddScoped<IProfessionalScheduleRepository, ProfessionalScheduleRepository>();
+
 
 // UseCases
 builder.Services.AddScoped<EnsureDefaultSuperAdministratorUseCase>();
@@ -115,6 +118,7 @@ builder.Services.AddScoped<MakeBedAsAvailableUseCase>();
 builder.Services.AddScoped<MakeBedAsUnderMaintenanceUseCase>();
 builder.Services.AddScoped<HospitalizePatientUseCase>();
 builder.Services.AddScoped<DischargePatientUseCase>();
+builder.Services.AddScoped<GenerateAvailableSlotsUseCase>();
 
 // =====================
 //  AUTENTICAÇÃO JWT
