@@ -28,6 +28,7 @@ using SGHSS.Application.UseCases.ProfessionalSchedules.Consult;
 using SGHSS.Application.UseCases.Patients.Update;
 using SGHSS.Application.UseCases.DigitalMedicalCertificates.Issue;
 using SGHSS.Application.UseCases.Appointments.Register;
+using SGHSS.Application.UseCases.Appointments.Read;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -125,7 +126,9 @@ builder.Services.AddScoped<DischargePatientUseCase>();
 builder.Services.AddScoped<GenerateAvailableSlotsUseCase>();
 builder.Services.AddScoped<UpdateMedicalRecordUseCase>();
 builder.Services.AddScoped<IssueDigitalMedicalCertificateUseCase>();
-builder.Services.AddScoped<ScheduleAppointmentUseCase>(); 
+builder.Services.AddScoped<ScheduleAppointmentUseCase>();
+builder.Services.AddScoped<GetPatientAppointmentsUseCase>();
+
 
 // =====================
 //  AUTENTICAÇÃO JWT
