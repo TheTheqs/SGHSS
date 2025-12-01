@@ -132,5 +132,11 @@ namespace SGHSS.Interface.Controllers
 
             return access.Value >= minimumLevel;
         }
+
+        protected bool HasExactAccessLevel(AccessLevel level)
+        {
+            var claim = User.FindFirst("access_level")?.Value;
+            return string.Equals(claim, level.ToString(), StringComparison.OrdinalIgnoreCase);
+        }
     }
 }
