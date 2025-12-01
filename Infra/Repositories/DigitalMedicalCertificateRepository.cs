@@ -1,5 +1,6 @@
 ﻿// Infra/Repositories/DigitalMedicalCertificateRepository
 
+using Microsoft.EntityFrameworkCore;
 using SGHSS.Application.Interfaces.Repositories;
 using SGHSS.Domain.Models;
 using SGHSS.Infra.Persistence;
@@ -38,6 +39,32 @@ namespace SGHSS.Infra.Repositories
         {
             await _context.DigitalMedicalCertificates.AddAsync(certificate);
             await _context.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// Retorna todos os atestados médicos digitais emitidos para o paciente especificado,
+        /// utilizando consulta sem rastreamento para maior desempenho em operações de leitura.
+        /// </summary>
+        /// <remarks>
+        /// A consulta aplica um filtro pelo identificador do paciente associado
+        /// e retorna os resultados ordenados de forma decrescente pela data de criação
+        /// (<see cref="DigitalMedicalCertificate.CreatedAt"/>), permitindo que camadas
+        /// superiores exibam os registros mais recentes primeiro.
+        /// 
+        /// Caso nenhum atestado seja encontrado, o método retorna uma lista vazia.
+        /// </remarks>
+        /// <param name="patientId">Identificador do paciente cujos atestados devem ser retornados.</param>
+        /// <returns>
+        /// Uma lista somente leitura contendo os atestados digitais associados ao paciente.
+        /// </returns>
+        public async Task<IReadOnlyList<DigitalMedicalCertificate>> GetByPatientIdAsync(Guid patientId)
+        {
+            return await _context
+                .DigitalMedicalCertificates
+                .AsNoTracking()
+                .Where(c => c.Patient != null && c.Patient.Id == patientId)
+                .OrderByDescending(c => c.IssuedAt)
+                .ToListAsync();
         }
     }
 }

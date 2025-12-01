@@ -16,5 +16,15 @@ namespace SGHSS.Application.Interfaces.Repositories
         /// Uma tarefa que representa a operação assíncrona.
         /// </returns>
         Task AddAsync(DigitalMedicalCertificate certificate);
+
+        /// <summary>
+        /// Retorna todos os atestados médicos digitais associados ao paciente informado.
+        /// </summary>
+        /// <param name="patientId">Identificador do paciente.</param>
+        /// <returns>
+        /// Uma lista contendo os atestados emitidos para o paciente,
+        /// ou uma lista vazia caso nenhum registro seja encontrado.
+        /// </returns>
+        Task<IReadOnlyList<DigitalMedicalCertificate>> GetByPatientIdAsync(Guid patientId);
     }
 }

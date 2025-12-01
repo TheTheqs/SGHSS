@@ -20,5 +20,15 @@ namespace SGHSS.Application.Interfaces.Repositories
         /// Uma tarefa que representa a operação assíncrona.
         /// </returns>
         Task AddAsync(EletronicPrescription prescription);
+
+        /// <summary>
+        /// Retorna todas as prescrições eletrônicas associadas ao paciente informado.
+        /// </summary>
+        /// <param name="patientId">Identificador do paciente.</param>
+        /// <returns>
+        /// Uma lista contendo as prescrições emitidas para o paciente,
+        /// ou uma lista vazia caso nenhum registro seja encontrado.
+        /// </returns>
+        Task<IReadOnlyList<EletronicPrescription>> GetByPatientIdAsync(Guid patientId);
     }
 }

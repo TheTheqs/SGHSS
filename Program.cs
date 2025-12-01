@@ -32,6 +32,8 @@ using SGHSS.Application.UseCases.Appointments.Read;
 using SGHSS.Application.UseCases.Appointments.GetLink;
 using SGHSS.Application.UseCases.Appointments.Update;
 using SGHSS.Application.UseCases.EletronicPrescriptions.Issue;
+using SGHSS.Application.UseCases.DigitalMedicalCertificates.Read;
+using SGHSS.Application.UseCases.EletronicPrescriptions.Read;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -135,6 +137,8 @@ builder.Services.AddScoped<GetPatientAppointmentsUseCase>();
 builder.Services.AddScoped<GetAppointmentLinkUseCase>();
 builder.Services.AddScoped<CompleteAppointmentUseCase>();
 builder.Services.AddScoped<IssueEletronicPrescriptionUseCase>();
+builder.Services.AddScoped<GetPatientMedicalCertificatesUseCase>();
+builder.Services.AddScoped<GetPatientEletronicPrescriptionsUseCase>();
 
 
 // =====================

@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SGHSS.Application.UseCases.DigitalMedicalCertificates.Issue;
+using SGHSS.Application.UseCases.DigitalMedicalCertificates.Read;
 using SGHSS.Application.UseCases.LogActivities.Register;
 using SGHSS.Domain.Enums;
 
@@ -21,16 +22,19 @@ namespace SGHSS.Interface.Controllers
     public class DigitalMedicalCertificatesController : BaseApiController
     {
         private readonly IssueDigitalMedicalCertificateUseCase _issueDigitalMedicalCertificateUseCase;
+        private readonly GetPatientMedicalCertificatesUseCase _getPatientMedicalCertificatesUseCase;
 
         /// <summary>
         /// Cria uma nova instância do controlador de atestados médicos digitais.
         /// </summary>
         public DigitalMedicalCertificatesController(
             IssueDigitalMedicalCertificateUseCase issueDigitalMedicalCertificateUseCase,
+            GetPatientMedicalCertificatesUseCase getPatientMedicalCertificatesUseCase,
             RegisterLogActivityUseCase registerLogActivityUseCase)
             : base(registerLogActivityUseCase)
         {
             _issueDigitalMedicalCertificateUseCase = issueDigitalMedicalCertificateUseCase;
+            _getPatientMedicalCertificatesUseCase = getPatientMedicalCertificatesUseCase;
         }
 
         /// <summary>
@@ -99,6 +103,94 @@ namespace SGHSS.Interface.Controllers
                     description: logDescription,
                     result: logResult,
                     healthUnitId: request.HealthUnitId
+                );
+            }
+        }
+
+        /// <summary>
+        /// Retorna todos os atestados médicos digitais associados a um paciente específico.
+        /// </summary>
+        /// <remarks>
+        /// Regra de autorização:
+        /// <list type="bullet">
+        /// <item>Apenas usuários autenticados com nível de acesso exatamente
+        /// <see cref="AccessLevel.Professional"/> podem consultar atestados médicos digitais;</item>
+        /// </list>
+        /// A consulta retorna os atestados em formato resumido, utilizando
+        /// <see cref="Application.UseCases.Common.DigitalMedicalCertificateDto"/>.
+        /// </remarks>
+        /// <param name="patientId">
+        /// Identificador do paciente cujos atestados médicos digitais devem ser consultados.
+        /// </param>
+        /// <returns>
+        /// Um <see cref="GetPatientMedicalCertificatesResponse"/> contendo o identificador
+        /// do paciente e a lista de atestados médicos digitais associados a ele.
+        /// </returns>
+        [HttpGet("patient/{patientId:guid}")]
+        [Authorize]
+        [ProducesResponseType(typeof(GetPatientMedicalCertificatesResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<ActionResult<GetPatientMedicalCertificatesResponse>> GetPatientMedicalCertificates(
+            [FromRoute] Guid patientId)
+        {
+            var accessLevel = GetUserAccessLevel();
+            var userId = GetUserId();
+
+            // Sem nível de acesso válido → acesso negado
+            if (accessLevel is null || accessLevel.Value < AccessLevel.Patient)
+                return Forbid();
+
+            // Se for exatamente Patient, só pode consultar seus próprios atestados.
+            if (accessLevel.Value == AccessLevel.Patient)
+            {
+                if (!userId.HasValue || userId.Value != patientId)
+                {
+                    return Forbid();
+                }
+            }
+
+            LogResult logResult = LogResult.Success;
+            string logDescription = "Consulta de atestados médicos digitais do paciente realizada com sucesso.";
+
+            var request = new GetPatientMedicalCertificatesRequest
+            {
+                PatientId = patientId
+            };
+
+            try
+            {
+                var response = await _getPatientMedicalCertificatesUseCase.Handle(request);
+                return Ok(response);
+            }
+            catch (ArgumentNullException ex)
+            {
+                logResult = LogResult.Failure;
+                logDescription = $"Falha ao consultar atestados médicos digitais do paciente: {ex.Message}";
+
+                return BadRequest(new { error = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                logResult = LogResult.Failure;
+                logDescription = $"Falha ao consultar atestados médicos digitais do paciente: {ex.Message}";
+
+                return BadRequest(new { error = ex.Message });
+            }
+            catch (Exception)
+            {
+                logResult = LogResult.Failure;
+                logDescription = "Erro inesperado ao consultar atestados médicos digitais do paciente.";
+                throw;
+            }
+            finally
+            {
+                await RegistrarLogAsync(
+                    userId,
+                    action: "DigitalMedicalCertificates.GetByPatient",
+                    description: logDescription,
+                    result: logResult,
+                    healthUnitId: null
                 );
             }
         }

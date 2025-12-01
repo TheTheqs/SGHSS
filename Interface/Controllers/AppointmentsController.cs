@@ -250,15 +250,6 @@ namespace SGHSS.Interface.Controllers
             if (accessLevel is null || accessLevel.Value < AccessLevel.Patient)
                 return Forbid();
 
-            // Se for exatamente Patient, só pode consultar o link de suas próprias consultas.
-            if (accessLevel.Value == AccessLevel.Patient)
-            {
-                if (!userId.HasValue || userId.Value != userId)
-                {
-                    return Forbid();
-                }
-            }
-
             LogResult logResult = LogResult.Success;
             string logDescription = "Link de teleconsulta recuperado com sucesso.";
 
@@ -346,7 +337,6 @@ namespace SGHSS.Interface.Controllers
             var accessLevel = GetUserAccessLevel();
             var userId = GetUserId();
 
-            // Apenas profissionais podem encerrar consultas.
             if (accessLevel is null || !HasMinimumAccessLevel(AccessLevel.Professional))
                 return Forbid();
 

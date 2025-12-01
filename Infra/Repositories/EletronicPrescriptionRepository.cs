@@ -1,6 +1,7 @@
 ﻿// Infra/Repositories/DigitalMedicalCertificateRepository
 
 
+using Microsoft.EntityFrameworkCore;
 using SGHSS.Application.Interfaces.Repositories;
 using SGHSS.Domain.Models;
 using SGHSS.Infra.Persistence;
@@ -39,6 +40,31 @@ namespace SGHSS.Infra.Repositories
         {
             await _context.EletronicPrescriptions.AddAsync(prescription);
             await _context.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// Retorna todas as prescrições eletrônicas emitidas para o paciente especificado,
+        /// utilizando consulta sem rastreamento para maior desempenho.
+        /// </summary>
+        /// <remarks>
+        /// A consulta ordena os resultados pela data de criação em ordem decrescente
+        /// (<see cref="EletronicPrescription.CreatedAt"/>), permitindo que camadas
+        /// superiores exibam primeiro as prescrições mais recentes.
+        ///
+        /// Caso nenhum registro exista para o paciente informado, uma lista vazia é retornada.
+        /// </remarks>
+        /// <param name="patientId">Identificador do paciente cujas prescrições devem ser retornadas.</param>
+        /// <returns>
+        /// Uma lista somente leitura contendo todas as prescrições associadas ao paciente.
+        /// </returns>
+        public async Task<IReadOnlyList<EletronicPrescription>> GetByPatientIdAsync(Guid patientId)
+        {
+            return await _context
+                .EletronicPrescriptions
+                .AsNoTracking()
+                .Where(p => p.Patient != null && p.Patient.Id == patientId)
+                .OrderByDescending(p => p.CreatedAt)
+                .ToListAsync();
         }
     }
 }
