@@ -6,6 +6,7 @@ using SGHSS.Application.UseCases.Appointments;
 using SGHSS.Application.UseCases.Appointments.GetLink;
 using SGHSS.Application.UseCases.Appointments.Read;
 using SGHSS.Application.UseCases.Appointments.Register;
+using SGHSS.Application.UseCases.Appointments.Update;
 using SGHSS.Application.UseCases.LogActivities.Register;
 using SGHSS.Domain.Enums;
 using SGHSS.Domain.Models;
@@ -23,6 +24,7 @@ namespace SGHSS.Interface.Controllers
         private readonly ScheduleAppointmentUseCase _scheduleAppointmentUseCase;
         private readonly GetPatientAppointmentsUseCase _getPatientAppointmentsUseCase;
         private readonly GetAppointmentLinkUseCase _getAppointmentLinkUseCase;
+        private readonly CompleteAppointmentUseCase _completeAppointmentUseCase;
 
         /// <summary>
         /// Cria uma nova instância do controlador de consultas.
@@ -39,16 +41,21 @@ namespace SGHSS.Interface.Controllers
         /// <param name="registerLogActivityUseCase">
         /// Caso de uso responsável por registrar logs de atividade.
         /// </param>
+        /// <param name="completeAppointmentUseCase">
+        /// Caso de uso responsável por finalizar uma consulta.
+        /// </param>
         public AppointmentsController(
             ScheduleAppointmentUseCase scheduleAppointmentUseCase,
             GetPatientAppointmentsUseCase getPatientAppointmentsUseCase,
             GetAppointmentLinkUseCase getAppointmentLinkUseCase,
+            CompleteAppointmentUseCase completeAppointmentUseCase,
             RegisterLogActivityUseCase registerLogActivityUseCase)
             : base(registerLogActivityUseCase)
         {
             _scheduleAppointmentUseCase = scheduleAppointmentUseCase;
             _getPatientAppointmentsUseCase = getPatientAppointmentsUseCase;
             _getAppointmentLinkUseCase = getAppointmentLinkUseCase;
+            _completeAppointmentUseCase = completeAppointmentUseCase;
         }
 
         /// <summary>
@@ -297,6 +304,85 @@ namespace SGHSS.Interface.Controllers
                 await RegistrarLogAsync(
                     userId,
                     action: "Appointments.GetTeleconsultationLink",
+                    description: logDescription,
+                    result: logResult,
+                    healthUnitId: null
+                );
+            }
+        }
+
+        /// <summary>
+        /// Conclui uma consulta previamente agendada, permitindo a emissão opcional
+        /// de documentos clínicos associados (atestado digital, prescrição eletrônica
+        /// e atualização de prontuário).
+        /// </summary>
+        /// <remarks>
+        /// Regra de autorização:
+        /// <list type="bullet">
+        /// <item>Somente usuários autenticados com nível de acesso
+        /// <see cref="AccessLevel.Professional"/> ou superior podem concluir consultas;</item>
+        /// </list>
+        /// O fluxo assume que a consulta já esteja em status
+        /// <see cref="AppointmentStatus.Confirmed"/> e que o agregado
+        /// <c>Appointment</c> possa ser carregado a partir do identificador
+        /// informado no <see cref="CompleteAppointmentRequest.AppointmentId"/>.
+        /// </remarks>
+        /// <param name="request">
+        /// Dados necessários para identificar a consulta e, opcionalmente,
+        /// emitir documentos clínicos vinculados a ela.
+        /// </param>
+        /// <returns>
+        /// Um <see cref="CompleteAppointmentResponse"/> contendo o status final da consulta
+        /// e os identificadores dos registros clínicos gerados (quando houver).
+        /// </returns>
+        [HttpPut("complete")]
+        [Authorize]
+        [ProducesResponseType(typeof(CompleteAppointmentResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<ActionResult<CompleteAppointmentResponse>> Complete(
+            [FromBody] CompleteAppointmentRequest request)
+        {
+            var accessLevel = GetUserAccessLevel();
+            var userId = GetUserId();
+
+            // Apenas profissionais podem encerrar consultas.
+            if (accessLevel is null || !HasMinimumAccessLevel(AccessLevel.Professional))
+                return Forbid();
+
+            LogResult logResult = LogResult.Success;
+            string logDescription = "Consulta concluída com sucesso.";
+
+            try
+            {
+                var response = await _completeAppointmentUseCase.Handle(request);
+                return Ok(response);
+            }
+            catch (ArgumentNullException ex)
+            {
+                logResult = LogResult.Failure;
+                logDescription = $"Falha ao concluir consulta: {ex.Message}";
+
+                return BadRequest(new { error = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                logResult = LogResult.Failure;
+                logDescription = $"Falha ao concluir consulta: {ex.Message}";
+
+                return BadRequest(new { error = ex.Message });
+            }
+            catch (Exception)
+            {
+                logResult = LogResult.Failure;
+                logDescription = "Erro inesperado ao concluir consulta.";
+                throw;
+            }
+            finally
+            {
+                await RegistrarLogAsync(
+                    userId,
+                    action: "Appointments.Complete",
                     description: logDescription,
                     result: logResult,
                     healthUnitId: null

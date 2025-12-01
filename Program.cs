@@ -30,6 +30,8 @@ using SGHSS.Application.UseCases.DigitalMedicalCertificates.Issue;
 using SGHSS.Application.UseCases.Appointments.Register;
 using SGHSS.Application.UseCases.Appointments.Read;
 using SGHSS.Application.UseCases.Appointments.GetLink;
+using SGHSS.Application.UseCases.Appointments.Update;
+using SGHSS.Application.UseCases.EletronicPrescriptions.Issue;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -103,6 +105,7 @@ builder.Services.AddScoped<IHospitalizationRepository, HospitalizationRepository
 builder.Services.AddScoped<IProfessionalScheduleRepository, ProfessionalScheduleRepository>();
 builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 builder.Services.AddScoped<IDigitalMedicalCertificateRepository, DigitalMedicalCertificateRepository>();
+builder.Services.AddScoped<IEletronicPrescriptionRepository, EletronicPrescriptionRepository>();
 
 // UseCases
 builder.Services.AddScoped<EnsureDefaultSuperAdministratorUseCase>();
@@ -130,6 +133,8 @@ builder.Services.AddScoped<IssueDigitalMedicalCertificateUseCase>();
 builder.Services.AddScoped<ScheduleAppointmentUseCase>();
 builder.Services.AddScoped<GetPatientAppointmentsUseCase>();
 builder.Services.AddScoped<GetAppointmentLinkUseCase>();
+builder.Services.AddScoped<CompleteAppointmentUseCase>();
+builder.Services.AddScoped<IssueEletronicPrescriptionUseCase>();
 
 
 // =====================
