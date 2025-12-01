@@ -22,11 +22,6 @@ namespace SGHSS.Application.Interfaces.Repositories
         /// Instância de <see cref="Appointment"/> com os dados já modificados
         /// e prontos para serem persistidos.
         /// </param>
-        /// <remarks>
-        /// Este método assume que a entidade já existe no contexto de dados.
-        /// As alterações serão gravadas de forma imediata por meio de
-        /// <c>SaveChangesAsync</c>.
-        /// </remarks>
         Task UpdateAsync(Appointment appointment);
 
         /// <summary>
@@ -38,5 +33,16 @@ namespace SGHSS.Application.Interfaces.Repositories
         /// ou <c>null</c> caso nenhuma consulta seja encontrada.
         /// </returns>
         Task<Appointment?> GetByIdAsync(Guid appointmentId);
+
+        /// <summary>
+        /// Retorna todas as consultas associadas a um paciente específico.
+        /// </summary>
+        /// <param name="patientId">Identificador do paciente cujas consultas serão recuperadas.</param>
+        /// <returns>
+        /// Uma lista contendo todas as instâncias de <see cref="Appointment"/>
+        /// vinculadas ao paciente informado. Caso o paciente não possua consultas,
+        /// a lista retornada será vazia.
+        /// </returns>
+        Task<List<Appointment>> GetAllByPatientIdAsync(Guid patientId);
     }
 }

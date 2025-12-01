@@ -137,9 +137,7 @@ namespace SGHSS.Application.UseCases.DigitalMedicalCertificates.Issue
                 HealthUnit = healthUnit
             };
 
-            // 8. (Opcional) reforça navegação inversa, caso deseje garantir em memória.
-            // EF geralmente faz o *fix-up* sozinho com o rastreamento,
-            // mas não custa nada deixar explícito se você gosta de clareza.
+            // 8. Reforço de navegação
             patient.DigitalMedicalCertificates.Add(certificate);
             professional.DigitalMedicalCertificates.Add(certificate);
             healthUnit.DigitalMedicalCertificates.Add(certificate);

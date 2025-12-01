@@ -18,9 +18,6 @@ namespace SGHSS.Infra.Repositories
         /// <summary>
         /// Inicializa uma nova instância do repositório de consultas.
         /// </summary>
-        /// <param name="context">
-        /// Contexto do Entity Framework Core utilizado para acesso ao banco de dados.
-        /// </param>
         public AppointmentRepository(SGHSSDbContext context)
         {
             _context = context;
@@ -29,13 +26,6 @@ namespace SGHSS.Infra.Repositories
         /// <summary>
         /// Persiste uma nova consulta no banco de dados.
         /// </summary>
-        /// <param name="appointment">
-        /// Instância de <see cref="Appointment"/> já validada e pronta para persistência.
-        /// </param>
-        /// <remarks>
-        /// Este método executa o <c>AddAsync</c> seguido de <c>SaveChangesAsync</c>,
-        /// garantindo gravação imediata.
-        /// </remarks>
         public async Task AddAsync(Appointment appointment)
         {
             await _context.Appointments.AddAsync(appointment);
@@ -45,15 +35,6 @@ namespace SGHSS.Infra.Repositories
         /// <summary>
         /// Atualiza uma consulta existente no banco de dados.
         /// </summary>
-        /// <param name="appointment">
-        /// Instância de <see cref="Appointment"/> contendo as alterações
-        /// a serem persistidas.
-        /// </param>
-        /// <remarks>
-        /// A entidade é marcada como modificada no contexto e,
-        /// em seguida, as alterações são gravadas por meio de
-        /// <c>SaveChangesAsync</c>.
-        /// </remarks>
         public async Task UpdateAsync(Appointment appointment)
         {
             _context.Appointments.Update(appointment);
@@ -63,16 +44,32 @@ namespace SGHSS.Infra.Repositories
         /// <summary>
         /// Recupera uma consulta pelo seu identificador único.
         /// </summary>
-        /// <param name="appointmentId">ID da consulta desejada.</param>
-        /// <returns>
-        /// A entidade <see cref="Appointment"/> correspondente ao ID informado,
-        /// ou <c>null</c> se nenhuma consulta for encontrada.
-        /// </returns>
         public async Task<Appointment?> GetByIdAsync(Guid appointmentId)
         {
             return await _context.Appointments
                 .Include(a => a.ScheduleSlot)
+                .Include(a => a.Patient)
+                .Include(a => a.DigitalMedicalCertificate)
                 .FirstOrDefaultAsync(a => a.Id == appointmentId);
+        }
+
+        /// <summary>
+        /// Retorna todas as consultas associadas a um paciente específico.
+        /// </summary>
+        /// <param name="patientId">Identificador do paciente cujas consultas serão recuperadas.</param>
+        /// <returns>
+        /// Uma lista contendo todas as instâncias de <see cref="Appointment"/>
+        /// vinculadas ao paciente informado. Caso o paciente não possua consultas,
+        /// a lista retornada será vazia.
+        /// </returns>
+        public async Task<List<Appointment>> GetAllByPatientIdAsync(Guid patientId)
+        {
+            return await _context.Appointments
+                .Include(a => a.ScheduleSlot)
+                .Include(a => a.DigitalMedicalCertificate)
+                .Where(a => a.Patient != null && a.Patient.Id == patientId)
+                .OrderBy(a => a.ScheduleSlot.StartDateTime)
+                .ToListAsync();
         }
     }
 }
