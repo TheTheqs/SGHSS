@@ -34,6 +34,8 @@ using SGHSS.Application.UseCases.Appointments.Update;
 using SGHSS.Application.UseCases.EletronicPrescriptions.Issue;
 using SGHSS.Application.UseCases.DigitalMedicalCertificates.Read;
 using SGHSS.Application.UseCases.EletronicPrescriptions.Read;
+using SGHSS.Application.UseCases.HomeCares.Register;
+using SGHSS.Application.UseCases.HomeCares.Read;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -108,6 +110,7 @@ builder.Services.AddScoped<IProfessionalScheduleRepository, ProfessionalSchedule
 builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 builder.Services.AddScoped<IDigitalMedicalCertificateRepository, DigitalMedicalCertificateRepository>();
 builder.Services.AddScoped<IEletronicPrescriptionRepository, EletronicPrescriptionRepository>();
+builder.Services.AddScoped<IHomeCareRepository, HomeCareRepository>();
 
 // UseCases
 builder.Services.AddScoped<EnsureDefaultSuperAdministratorUseCase>();
@@ -140,7 +143,8 @@ builder.Services.AddScoped<IssueEletronicPrescriptionUseCase>();
 builder.Services.AddScoped<GetPatientMedicalCertificatesUseCase>();
 builder.Services.AddScoped<GetPatientEletronicPrescriptionsUseCase>();
 builder.Services.AddScoped<UpdateAppointmentStatusUseCase>();
-
+builder.Services.AddScoped<RegisterHomeCareUseCase>();
+builder.Services.AddScoped<GetPatientHomeCaresUseCase>();
 
 // =====================
 //  AUTENTICAÇÃO JWT
