@@ -139,6 +139,7 @@ builder.Services.AddScoped<CompleteAppointmentUseCase>();
 builder.Services.AddScoped<IssueEletronicPrescriptionUseCase>();
 builder.Services.AddScoped<GetPatientMedicalCertificatesUseCase>();
 builder.Services.AddScoped<GetPatientEletronicPrescriptionsUseCase>();
+builder.Services.AddScoped<UpdateAppointmentStatusUseCase>();
 
 
 // =====================
