@@ -4,38 +4,41 @@
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using SGHSS.Application.Interfaces.Repositories;
 using SGHSS.Application.Interfaces.Services;
 using SGHSS.Application.UseCases.Administrators.Initialize;
+using SGHSS.Application.UseCases.Administrators.Read;
+using SGHSS.Application.UseCases.Administrators.Register;
+using SGHSS.Application.UseCases.Administrators.Update;
+using SGHSS.Application.UseCases.Appointments.GetLink;
+using SGHSS.Application.UseCases.Appointments.Read;
+using SGHSS.Application.UseCases.Appointments.Register;
+using SGHSS.Application.UseCases.Appointments.Update;
 using SGHSS.Application.UseCases.AuditReports.Consult;
 using SGHSS.Application.UseCases.AuditReports.Generate;
 using SGHSS.Application.UseCases.Authentication;
+using SGHSS.Application.UseCases.DigitalMedicalCertificates.Issue;
+using SGHSS.Application.UseCases.DigitalMedicalCertificates.Read;
+using SGHSS.Application.UseCases.EletronicPrescriptions.Issue;
+using SGHSS.Application.UseCases.EletronicPrescriptions.Read;
+using SGHSS.Application.UseCases.HomeCares.Read;
+using SGHSS.Application.UseCases.HomeCares.Register;
+using SGHSS.Application.UseCases.InventoryItems.Consult;
+using SGHSS.Application.UseCases.InventoryItems.Register;
+using SGHSS.Application.UseCases.InventoryItems.Update;
 using SGHSS.Application.UseCases.LogActivities.Register;
+using SGHSS.Application.UseCases.Patients.Read;
+using SGHSS.Application.UseCases.Patients.Register;
+using SGHSS.Application.UseCases.Patients.Update;
+using SGHSS.Application.UseCases.Professionals.Read;
+using SGHSS.Application.UseCases.Professionals.Register;
+using SGHSS.Application.UseCases.ProfessionalSchedules.Consult;
 using SGHSS.Infra.Persistence;
 using SGHSS.Infra.Repositories;
 using SGHSS.Infra.Services;
 using System.Text;
-using SGHSS.Application.UseCases.Administrators.Register;
-using SGHSS.Application.UseCases.Patients.Register;
-using SGHSS.Application.UseCases.Professionals.Register;
-using SGHSS.Application.UseCases.Administrators.Read;
-using SGHSS.Application.UseCases.Patients.Read;
-using SGHSS.Application.UseCases.Professionals.Read;
-using SGHSS.Application.UseCases.Administrators.Update;
-using SGHSS.Application.UseCases.ProfessionalSchedules.Consult;
-using SGHSS.Application.UseCases.Patients.Update;
-using SGHSS.Application.UseCases.DigitalMedicalCertificates.Issue;
-using SGHSS.Application.UseCases.Appointments.Register;
-using SGHSS.Application.UseCases.Appointments.Read;
-using SGHSS.Application.UseCases.Appointments.GetLink;
-using SGHSS.Application.UseCases.Appointments.Update;
-using SGHSS.Application.UseCases.EletronicPrescriptions.Issue;
-using SGHSS.Application.UseCases.DigitalMedicalCertificates.Read;
-using SGHSS.Application.UseCases.EletronicPrescriptions.Read;
-using SGHSS.Application.UseCases.HomeCares.Register;
-using SGHSS.Application.UseCases.HomeCares.Read;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -111,6 +114,7 @@ builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 builder.Services.AddScoped<IDigitalMedicalCertificateRepository, DigitalMedicalCertificateRepository>();
 builder.Services.AddScoped<IEletronicPrescriptionRepository, EletronicPrescriptionRepository>();
 builder.Services.AddScoped<IHomeCareRepository, HomeCareRepository>();
+builder.Services.AddScoped<IInventoryItemRepository, InventoryItemRepository>();
 
 // UseCases
 builder.Services.AddScoped<EnsureDefaultSuperAdministratorUseCase>();
@@ -145,6 +149,10 @@ builder.Services.AddScoped<GetPatientEletronicPrescriptionsUseCase>();
 builder.Services.AddScoped<UpdateAppointmentStatusUseCase>();
 builder.Services.AddScoped<RegisterHomeCareUseCase>();
 builder.Services.AddScoped<GetPatientHomeCaresUseCase>();
+builder.Services.AddScoped<RegisterInventoryItemUseCase>();
+builder.Services.AddScoped<RegisterInventoryMovementUseCase>();
+builder.Services.AddScoped<ConsultInventoryItemUseCase>();
+
 
 // =====================
 //  AUTENTICAÇÃO JWT

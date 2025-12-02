@@ -1,7 +1,6 @@
 ﻿// Application/UseCases/InventoryItems/Update/RegisterInventoryMovementUseCase.cs
 
 using SGHSS.Application.Interfaces.Repositories;
-using SGHSS.Application.UseCases.InventoryItems.Consult;
 using SGHSS.Domain.Enums;
 using SGHSS.Domain.Models;
 
