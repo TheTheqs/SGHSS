@@ -3,6 +3,7 @@
 using SGHSS.Application.Interfaces.Repositories;
 using SGHSS.Application.UseCases.DigitalMedicalCertificates.Issue;
 using SGHSS.Application.UseCases.EletronicPrescriptions.Issue;
+using SGHSS.Application.UseCases.Notifications.Create;
 using SGHSS.Application.UseCases.Patients.Update;
 using SGHSS.Domain.Enums;
 using SGHSS.Domain.Models;
@@ -26,6 +27,7 @@ namespace SGHSS.Application.UseCases.Appointments.Update
         private readonly IssueDigitalMedicalCertificateUseCase _issueDigitalMedicalCertificateUseCase;
         private readonly IssueEletronicPrescriptionUseCase _issueEletronicPrescriptionUseCase;
         private readonly UpdateMedicalRecordUseCase _updateMedicalRecordUseCase;
+        private readonly CreateNotificationUseCase _createNotificationUseCase;
 
         /// <summary>
         /// Cria uma nova instância do caso de uso de conclusão de consulta.
@@ -46,12 +48,14 @@ namespace SGHSS.Application.UseCases.Appointments.Update
             IAppointmentRepository appointmentRepository,
             IssueDigitalMedicalCertificateUseCase issueDigitalMedicalCertificateUseCase,
             IssueEletronicPrescriptionUseCase issueEletronicPrescriptionUseCase,
-            UpdateMedicalRecordUseCase updateMedicalRecordUseCase)
+            UpdateMedicalRecordUseCase updateMedicalRecordUseCase,
+            CreateNotificationUseCase createNotificationUseCase)
         {
             _appointmentRepository = appointmentRepository;
             _issueDigitalMedicalCertificateUseCase = issueDigitalMedicalCertificateUseCase;
             _issueEletronicPrescriptionUseCase = issueEletronicPrescriptionUseCase;
             _updateMedicalRecordUseCase = updateMedicalRecordUseCase;
+            _createNotificationUseCase = createNotificationUseCase;
         }
 
         /// <summary>
@@ -163,7 +167,17 @@ namespace SGHSS.Application.UseCases.Appointments.Update
 
             await _appointmentRepository.UpdateAsync(appointment);
 
-            // 6) Monta o response
+            // 6) Notificações
+            var notifyPatientRequest = new CreateNotificationRequest
+            {
+                RecipientId = appointment.Patient.Id,
+                Channel = NotificationChannel.PushNotification,
+                Message = $"Sua consulta foi agendada para {appointment.StartTime:dd/MM/yyyy HH:mm}."
+            };
+
+            await _createNotificationUseCase.Handle(notifyPatientRequest);
+
+            // 7) Monta o response
             return new CompleteAppointmentResponse
             {
                 AppointmentId = appointment.Id,

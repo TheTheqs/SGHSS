@@ -5,9 +5,10 @@ using Microsoft.EntityFrameworkCore;
 using SGHSS.Application.Interfaces.Repositories;
 using SGHSS.Application.UseCases.Appointments.Register;
 using SGHSS.Application.UseCases.Common;
-using SGHSS.Application.UseCases.ProfessionalSchedules.Consult;
-using SGHSS.Application.UseCases.Professionals.Register;
+using SGHSS.Application.UseCases.Notifications.Create;
 using SGHSS.Application.UseCases.Patients.Register;
+using SGHSS.Application.UseCases.Professionals.Register;
+using SGHSS.Application.UseCases.ProfessionalSchedules.Consult;
 using SGHSS.Domain.Enums;
 using SGHSS.Domain.Models;
 using SGHSS.Domain.ValueObjects;
@@ -34,6 +35,10 @@ namespace SGHSS.Tests.Application.Appointments.Register
             var patientRepo = new PatientRepository(context);
             IProfessionalScheduleRepository scheduleRepo = new ProfessionalScheduleRepository(context);
             IAppointmentRepository appointmentRepo = new AppointmentRepository(context);
+            INotificationRepository notificationRepo = new NotificationRepository(context);
+            IUserRepository userRepo = new UserRepository(context);
+
+            var createNotificationUseCase = new CreateNotificationUseCase(notificationRepo, userRepo);
 
             // Profissional
             RegisterProfessionalRequest professionalExample =
@@ -122,7 +127,8 @@ namespace SGHSS.Tests.Application.Appointments.Register
             var scheduleAppointmentUseCase = new ScheduleAppointmentUseCase(
                 scheduleRepo,
                 patientRepo,
-                appointmentRepo);
+                appointmentRepo,
+                createNotificationUseCase);
 
             // Act
             var response = await scheduleAppointmentUseCase.Handle(appointmentRequest);
@@ -160,6 +166,9 @@ namespace SGHSS.Tests.Application.Appointments.Register
             var patientRepo = new PatientRepository(context);
             IProfessionalScheduleRepository scheduleRepo = new ProfessionalScheduleRepository(context);
             IAppointmentRepository appointmentRepo = new AppointmentRepository(context);
+            INotificationRepository notificationRepo = new NotificationRepository(context);
+            IUserRepository userRepo = new UserRepository(context);
+            var createNotificationUseCase = new CreateNotificationUseCase(notificationRepo, userRepo);
 
             // Profissional
             RegisterProfessionalRequest professionalExample =
@@ -239,7 +248,8 @@ namespace SGHSS.Tests.Application.Appointments.Register
             var scheduleAppointmentUseCase = new ScheduleAppointmentUseCase(
                 scheduleRepo,
                 patientRepo,
-                appointmentRepo);
+                appointmentRepo,
+                createNotificationUseCase);
 
             // Primeiro agendamento (deve funcionar)
             var firstRequest = AppointmentGenerator.GenerateAppointment(
@@ -279,6 +289,9 @@ namespace SGHSS.Tests.Application.Appointments.Register
             var patientRepo = new PatientRepository(context);
             IProfessionalScheduleRepository scheduleRepo = new ProfessionalScheduleRepository(context);
             IAppointmentRepository appointmentRepo = new AppointmentRepository(context);
+            INotificationRepository notificationRepo = new NotificationRepository(context);
+            IUserRepository userRepo = new UserRepository(context);
+            var createNotificationUseCase = new CreateNotificationUseCase(notificationRepo, userRepo);
 
             // Profissional
             RegisterProfessionalRequest professionalExample =
@@ -355,7 +368,8 @@ namespace SGHSS.Tests.Application.Appointments.Register
             var scheduleAppointmentUseCase = new ScheduleAppointmentUseCase(
                 scheduleRepo,
                 patientRepo,
-                appointmentRepo);
+                appointmentRepo,
+                createNotificationUseCase);
 
             // Act
             Func<Task> act = () => scheduleAppointmentUseCase.Handle(appointmentRequest);
@@ -376,6 +390,9 @@ namespace SGHSS.Tests.Application.Appointments.Register
             var patientRepo = new PatientRepository(context);
             IProfessionalScheduleRepository scheduleRepo = new ProfessionalScheduleRepository(context);
             IAppointmentRepository appointmentRepo = new AppointmentRepository(context);
+            INotificationRepository notificationRepo = new NotificationRepository(context);
+            IUserRepository userRepo = new UserRepository(context);
+            var createNotificationUseCase = new CreateNotificationUseCase(notificationRepo, userRepo);
 
             // Profissional
             RegisterProfessionalRequest professionalExample =
@@ -435,7 +452,8 @@ namespace SGHSS.Tests.Application.Appointments.Register
             var scheduleAppointmentUseCase = new ScheduleAppointmentUseCase(
                 scheduleRepo,
                 patientRepo,
-                appointmentRepo);
+                appointmentRepo,
+                createNotificationUseCase);
 
             // Act
             Func<Task> act = () => scheduleAppointmentUseCase.Handle(appointmentRequest);

@@ -33,5 +33,12 @@ namespace SGHSS.Application.Interfaces.Repositories
         /// ou <c>null</c> caso nenhum registro seja encontrado.
         /// </returns>
         Task<Notification?> GetByIdAsync(Guid notificationId);
+
+        /// <summary>
+        /// Retorna todas as notificações pertencentes ao usuário informado.
+        /// </summary>
+        /// <param name="userId">Identificador do usuário destinatário.</param>
+        /// <returns>Coleção de notificações associadas ao usuário.</returns>
+        Task<IReadOnlyCollection<Notification>> GetByUserIdAsync(Guid userId);
     }
 }

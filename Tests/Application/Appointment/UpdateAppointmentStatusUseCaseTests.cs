@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using SGHSS.Application.Interfaces.Repositories;
 using SGHSS.Application.UseCases.Appointments.Update;
 using SGHSS.Application.UseCases.Common;
+using SGHSS.Application.UseCases.Notifications.Create;
 using SGHSS.Application.UseCases.Patients.Register;
 using SGHSS.Domain.Enums;
 using SGHSS.Domain.Models;
@@ -32,7 +33,10 @@ namespace SGHSS.Tests.Application.Appointments.Update
 
             IPatientRepository patientRepo = new PatientRepository(context);
             IAppointmentRepository appointmentRepo = new AppointmentRepository(context);
+            INotificationRepository notificationRepo = new NotificationRepository(context);
+            IUserRepository userRepo = new UserRepository(context);
 
+            var createNotificationUseCase = new CreateNotificationUseCase(notificationRepo, userRepo);
             var registerPatientUseCase = new RegisterPatientUseCase(patientRepo);
 
             // Paciente com consentimentos mínimos
@@ -77,7 +81,7 @@ namespace SGHSS.Tests.Application.Appointments.Update
             await context.Appointments.AddAsync(appointment);
             await context.SaveChangesAsync();
 
-            var useCase = new UpdateAppointmentStatusUseCase(appointmentRepo);
+            var useCase = new UpdateAppointmentStatusUseCase(appointmentRepo, createNotificationUseCase);
 
             var request = UpdateAppointmentStatusRequestGenerator.Generate(
                 providedAppointmentId: appointment.Id,
@@ -114,8 +118,11 @@ namespace SGHSS.Tests.Application.Appointments.Update
             using var context = DbContextTestFactory.CreateInMemoryContext();
 
             IAppointmentRepository appointmentRepo = new AppointmentRepository(context);
+            INotificationRepository notificationRepo = new NotificationRepository(context);
+            IUserRepository userRepo = new UserRepository(context);
 
-            var useCase = new UpdateAppointmentStatusUseCase(appointmentRepo);
+            var createNotificationUseCase = new CreateNotificationUseCase(notificationRepo, userRepo);
+            var useCase = new UpdateAppointmentStatusUseCase(appointmentRepo, createNotificationUseCase);
 
             var request = UpdateAppointmentStatusRequestGenerator.Generate(
                 providedAppointmentId: Guid.NewGuid()
@@ -141,7 +148,10 @@ namespace SGHSS.Tests.Application.Appointments.Update
 
             IPatientRepository patientRepo = new PatientRepository(context);
             IAppointmentRepository appointmentRepo = new AppointmentRepository(context);
+            INotificationRepository notificationRepo = new NotificationRepository(context);
+            IUserRepository userRepo = new UserRepository(context);
 
+            var createNotificationUseCase = new CreateNotificationUseCase(notificationRepo, userRepo);
             var registerPatientUseCase = new RegisterPatientUseCase(patientRepo);
 
             // Paciente
@@ -183,7 +193,7 @@ namespace SGHSS.Tests.Application.Appointments.Update
             await context.Appointments.AddAsync(appointment);
             await context.SaveChangesAsync();
 
-            var useCase = new UpdateAppointmentStatusUseCase(appointmentRepo);
+            var useCase = new UpdateAppointmentStatusUseCase(appointmentRepo, createNotificationUseCase);
 
             var request = UpdateAppointmentStatusRequestGenerator.Generate(
                 providedAppointmentId: appointment.Id,
@@ -211,7 +221,10 @@ namespace SGHSS.Tests.Application.Appointments.Update
 
             IPatientRepository patientRepo = new PatientRepository(context);
             IAppointmentRepository appointmentRepo = new AppointmentRepository(context);
+            INotificationRepository notificationRepo = new NotificationRepository(context);
+            IUserRepository userRepo = new UserRepository(context);
 
+            var createNotificationUseCase = new CreateNotificationUseCase(notificationRepo, userRepo);
             var registerPatientUseCase = new RegisterPatientUseCase(patientRepo);
 
             // Paciente
@@ -253,7 +266,7 @@ namespace SGHSS.Tests.Application.Appointments.Update
             await context.Appointments.AddAsync(appointment);
             await context.SaveChangesAsync();
 
-            var useCase = new UpdateAppointmentStatusUseCase(appointmentRepo);
+            var useCase = new UpdateAppointmentStatusUseCase(appointmentRepo, createNotificationUseCase);
 
             var request = UpdateAppointmentStatusRequestGenerator.Generate(
                 providedAppointmentId: appointment.Id,

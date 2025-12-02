@@ -29,12 +29,16 @@ using SGHSS.Application.UseCases.InventoryItems.Consult;
 using SGHSS.Application.UseCases.InventoryItems.Register;
 using SGHSS.Application.UseCases.InventoryItems.Update;
 using SGHSS.Application.UseCases.LogActivities.Register;
+using SGHSS.Application.UseCases.Notifications.Create;
+using SGHSS.Application.UseCases.Notifications.Read;
+using SGHSS.Application.UseCases.Notifications.Update;
 using SGHSS.Application.UseCases.Patients.Read;
 using SGHSS.Application.UseCases.Patients.Register;
 using SGHSS.Application.UseCases.Patients.Update;
 using SGHSS.Application.UseCases.Professionals.Read;
 using SGHSS.Application.UseCases.Professionals.Register;
 using SGHSS.Application.UseCases.ProfessionalSchedules.Consult;
+using SGHSS.Infra;
 using SGHSS.Infra.Persistence;
 using SGHSS.Infra.Repositories;
 using SGHSS.Infra.Services;
@@ -115,6 +119,7 @@ builder.Services.AddScoped<IDigitalMedicalCertificateRepository, DigitalMedicalC
 builder.Services.AddScoped<IEletronicPrescriptionRepository, EletronicPrescriptionRepository>();
 builder.Services.AddScoped<IHomeCareRepository, HomeCareRepository>();
 builder.Services.AddScoped<IInventoryItemRepository, InventoryItemRepository>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 
 // UseCases
 builder.Services.AddScoped<EnsureDefaultSuperAdministratorUseCase>();
@@ -152,6 +157,9 @@ builder.Services.AddScoped<GetPatientHomeCaresUseCase>();
 builder.Services.AddScoped<RegisterInventoryItemUseCase>();
 builder.Services.AddScoped<RegisterInventoryMovementUseCase>();
 builder.Services.AddScoped<ConsultInventoryItemUseCase>();
+builder.Services.AddScoped<CreateNotificationUseCase>();
+builder.Services.AddScoped<UpdateNotificationStatusUseCase>();
+builder.Services.AddScoped<GetUserNotificationsUseCase>();
 
 
 // =====================

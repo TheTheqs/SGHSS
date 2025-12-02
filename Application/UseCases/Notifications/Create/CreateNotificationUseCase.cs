@@ -88,16 +88,6 @@ namespace SGHSS.Application.UseCases.Notifications.Create
                 );
             }
 
-            // Verifica se o consentimento de notificação está ativo
-            var notificationConsent = recipient.GetActiveConsent(ConsentScope.Notification);
-
-            if (notificationConsent is null)
-            {
-                throw new InvalidOperationException(
-                    "O usuário não possui um consentimento de notificação ativo."
-                );
-            }
-
             // Cria a entidade de domínio Notification.
             // Observação: o Id será gerado pela infraestrutura/EF, conforme configuração.
             var notification = new Notification

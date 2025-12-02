@@ -1,6 +1,7 @@
 ﻿// Application/UseCases/Appointments/Update/UpdateAppointmentStatusUseCase.cs
 
 using SGHSS.Application.Interfaces.Repositories;
+using SGHSS.Application.UseCases.Notifications.Create;
 using SGHSS.Domain.Enums;
 
 namespace SGHSS.Application.UseCases.Appointments.Update
@@ -18,14 +19,16 @@ namespace SGHSS.Application.UseCases.Appointments.Update
     public sealed class UpdateAppointmentStatusUseCase
     {
         private readonly IAppointmentRepository _appointmentRepository;
+        private readonly CreateNotificationUseCase _createNotificationUseCase;
 
         /// <summary>
         /// Cria uma nova instância do caso de uso de atualização de status de consulta.
         /// </summary>
         /// <param name="appointmentRepository">Repositório de consultas (appointments).</param>
-        public UpdateAppointmentStatusUseCase(IAppointmentRepository appointmentRepository)
+        public UpdateAppointmentStatusUseCase(IAppointmentRepository appointmentRepository, CreateNotificationUseCase createNotificationUseCase)
         {
             _appointmentRepository = appointmentRepository;
+            _createNotificationUseCase = createNotificationUseCase;
         }
 
         /// <summary>
@@ -73,7 +76,17 @@ namespace SGHSS.Application.UseCases.Appointments.Update
             // 4) Persiste alterações
             await _appointmentRepository.UpdateAsync(appointment);
 
-            // 5) Monta response
+            // 5) Notificações
+            var notifyPatientRequest = new CreateNotificationRequest
+            {
+                RecipientId = appointment.Patient.Id,
+                Channel = NotificationChannel.PushNotification,
+                Message = $"O Status da sua consulta foi alterado para {appointment.Status}."
+            };
+
+            await _createNotificationUseCase.Handle(notifyPatientRequest);
+
+            // 6) Monta response
             return new UpdateAppointmentStatusResponse(
                 appointmentId: appointment.Id,
                 scheduleSlotId: appointment.ScheduleSlot.Id,

@@ -2,6 +2,7 @@
 
 using SGHSS.Application.Interfaces.Repositories;
 using SGHSS.Application.Mappers;
+using SGHSS.Application.UseCases.Notifications.Create;
 using SGHSS.Domain.Enums;
 using SGHSS.Domain.Models;
 using SGHSS.Domain.ValueObjects;
@@ -17,15 +18,18 @@ namespace SGHSS.Application.UseCases.Appointments.Register
         private readonly IProfessionalScheduleRepository _professionalScheduleRepository;
         private readonly IPatientRepository _patientRepository;
         private readonly IAppointmentRepository _appointmentRepository;
+        private readonly CreateNotificationUseCase _createNotificationUseCase;
 
         public ScheduleAppointmentUseCase(
             IProfessionalScheduleRepository professionalScheduleRepository,
             IPatientRepository patientRepository,
-            IAppointmentRepository appointmentRepository)
+            IAppointmentRepository appointmentRepository,
+            CreateNotificationUseCase createNotificationUseCase)
         {
             _professionalScheduleRepository = professionalScheduleRepository;
             _patientRepository = patientRepository;
             _appointmentRepository = appointmentRepository;
+            _createNotificationUseCase = createNotificationUseCase;
         }
 
         public async Task<ScheduleAppointmentResponse> Handle(ScheduleAppointmentRequest request)
@@ -93,9 +97,32 @@ namespace SGHSS.Application.UseCases.Appointments.Register
                 Patient = patient
             };
 
-            // 7) Persiste tudo
+            // 7) Persistencia
             await _appointmentRepository.AddAsync(appointment);
 
+            // 8) Disparo de notificações
+
+            // Notificação para o PACIENTE
+            var notifyPatientRequest = new CreateNotificationRequest
+            {
+                RecipientId = appointment.Patient.Id,
+                Channel = NotificationChannel.PushNotification,
+                Message = $"Sua consulta foi agendada para {appointment.StartTime:dd/MM/yyyy HH:mm}."
+            };
+
+            await _createNotificationUseCase.Handle(notifyPatientRequest);
+
+            // Notificação para o PROFISSIONAL
+            var notifyProfessionalRequest = new CreateNotificationRequest
+            {
+                RecipientId = request.ProfessionalId,
+                Channel = NotificationChannel.PushNotification,
+                Message = $"Nova consulta agendada com o paciente {appointment.Patient.Name} em {appointment.StartTime:dd/MM/yyyy HH:mm}."
+            };
+
+            await _createNotificationUseCase.Handle(notifyProfessionalRequest);
+
+            // Retorno
             return new ScheduleAppointmentResponse
             {
                 AppointmentId = appointment.Id,

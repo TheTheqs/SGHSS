@@ -22,6 +22,7 @@ using SGHSS.Tests.TestData.Models.SGHSS.Tests.TestData.Patients;
 using SGHSS.Tests.TestData.Models.SGHSS.Tests.TestData.Professionals;
 using SGHSS.Tests.TestData.Models.SGHSS.Tests.TestData.MedicalRecords;
 using Xunit;
+using SGHSS.Application.UseCases.Notifications.Create;
 
 namespace SGHSS.Tests.Application.Appointments.Update
 {
@@ -43,10 +44,14 @@ namespace SGHSS.Tests.Application.Appointments.Update
             IAppointmentRepository appointmentRepo = new AppointmentRepository(context);
             IDigitalMedicalCertificateRepository certificateRepo = new DigitalMedicalCertificateRepository(context);
             IEletronicPrescriptionRepository prescriptionRepo = new EletronicPrescriptionRepository(context);
+            INotificationRepository notificationRepo = new NotificationRepository(context);
+            IUserRepository userRepo = new UserRepository(context);
 
+            var createNotificationUseCase = new CreateNotificationUseCase(notificationRepo, userRepo);
             var registerPatientUseCase = new RegisterPatientUseCase(patientRepo);
             var registerProfessionalUseCase = new RegisterProfessionalUseCase(professionalRepo);
             var registerHealthUnitUseCase = new RegisterHealthUnitUseCase(healthUnitRepo);
+
 
             // Paciente
             RegisterPatientRequest patientExample = PatientGenerator.GeneratePatient();
@@ -140,7 +145,8 @@ namespace SGHSS.Tests.Application.Appointments.Update
                 appointmentRepo,
                 issueCertificateUseCase,
                 issuePrescriptionUseCase,
-                updateMedicalRecordUseCase
+                updateMedicalRecordUseCase,
+                createNotificationUseCase
             );
 
             var request = CompleteAppointmentRequestGenerator.Generate(
@@ -191,7 +197,10 @@ namespace SGHSS.Tests.Application.Appointments.Update
             IAppointmentRepository appointmentRepo = new AppointmentRepository(context);
             IDigitalMedicalCertificateRepository certificateRepo = new DigitalMedicalCertificateRepository(context);
             IEletronicPrescriptionRepository prescriptionRepo = new EletronicPrescriptionRepository(context);
+            INotificationRepository notificationRepo = new NotificationRepository(context);
+            IUserRepository userRepo = new UserRepository(context);
 
+            var createNotificationUseCase = new CreateNotificationUseCase(notificationRepo, userRepo);
             var registerPatientUseCase = new RegisterPatientUseCase(patientRepo);
             var registerProfessionalUseCase = new RegisterProfessionalUseCase(professionalRepo);
             var registerHealthUnitUseCase = new RegisterHealthUnitUseCase(healthUnitRepo);
@@ -288,7 +297,8 @@ namespace SGHSS.Tests.Application.Appointments.Update
                 appointmentRepo,
                 issueCertificateUseCase,
                 issuePrescriptionUseCase,
-                updateMedicalRecordUseCase
+                updateMedicalRecordUseCase,
+                createNotificationUseCase
             );
 
             // Requests filhos usando generators + overrides para IDs corretos
@@ -366,6 +376,10 @@ namespace SGHSS.Tests.Application.Appointments.Update
             IAppointmentRepository appointmentRepo = new AppointmentRepository(context);
             IDigitalMedicalCertificateRepository certificateRepo = new DigitalMedicalCertificateRepository(context);
             IEletronicPrescriptionRepository prescriptionRepo = new EletronicPrescriptionRepository(context);
+            INotificationRepository notificationRepo = new NotificationRepository(context);
+            IUserRepository userRepo = new UserRepository(context);
+
+            var createNotificationUseCase = new CreateNotificationUseCase(notificationRepo, userRepo);
 
             var issueCertificateUseCase = new IssueDigitalMedicalCertificateUseCase(
                 patientRepo,
@@ -394,7 +408,8 @@ namespace SGHSS.Tests.Application.Appointments.Update
                 appointmentRepo,
                 issueCertificateUseCase,
                 issuePrescriptionUseCase,
-                updateMedicalRecordUseCase
+                updateMedicalRecordUseCase,
+                createNotificationUseCase
             );
 
             var request = CompleteAppointmentRequestGenerator.Generate(
@@ -425,7 +440,10 @@ namespace SGHSS.Tests.Application.Appointments.Update
             IAppointmentRepository appointmentRepo = new AppointmentRepository(context);
             IDigitalMedicalCertificateRepository certificateRepo = new DigitalMedicalCertificateRepository(context);
             IEletronicPrescriptionRepository prescriptionRepo = new EletronicPrescriptionRepository(context);
+            INotificationRepository notificationRepo = new NotificationRepository(context);
+            IUserRepository userRepo = new UserRepository(context);
 
+            var createNotificationUseCase = new CreateNotificationUseCase(notificationRepo, userRepo);
             var registerPatientUseCase = new RegisterPatientUseCase(patientRepo);
 
             // Paciente (mínimo necessário para criar consulta)
@@ -492,7 +510,8 @@ namespace SGHSS.Tests.Application.Appointments.Update
                 appointmentRepo,
                 issueCertificateUseCase,
                 issuePrescriptionUseCase,
-                updateMedicalRecordUseCase
+                updateMedicalRecordUseCase,
+                createNotificationUseCase
             );
 
             var request = CompleteAppointmentRequestGenerator.Generate(

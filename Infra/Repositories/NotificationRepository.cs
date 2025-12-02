@@ -68,5 +68,18 @@ namespace SGHSS.Infra.Repositories
                 .Include(n => n.Recipient)
                 .FirstOrDefaultAsync(n => n.Id == notificationId);
         }
+
+        /// <summary>
+        /// Retorna todas as notificações pertencentes ao usuário informado.
+        /// </summary>
+        /// <param name="userId">Identificador do usuário destinatário.</param>
+        /// <returns>Coleção de notificações associadas ao usuário.</returns>
+        public async Task<IReadOnlyCollection<Notification>> GetByUserIdAsync(Guid userId)
+        {
+            return await _context.Notifications
+                .Where(n => n.Recipient.Id == userId)
+                .OrderByDescending(n => n.CreatedAt)
+                .ToListAsync();
+        }
     }
 }

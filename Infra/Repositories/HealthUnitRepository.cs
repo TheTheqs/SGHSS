@@ -98,11 +98,6 @@ namespace SGHSS.Infra.Repositories
             var health_units = _context.HealthUnits
                                .Include(h => h.Beds);
 
-            health_units
-                .SelectMany(hu => hu.Beds)
-                .ToList()
-                .ForEach(bed => bed.Status = Domain.Enums.BedStatus.Available);
-
             return await _context.HealthUnits
                 .AsNoTracking()
                 .ToListAsync();
