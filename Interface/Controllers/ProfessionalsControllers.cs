@@ -6,6 +6,7 @@ using SGHSS.Application.UseCases.Common;
 using SGHSS.Application.UseCases.LogActivities.Register;
 using SGHSS.Application.UseCases.Professionals.Read;
 using SGHSS.Application.UseCases.Professionals.Register;
+using SGHSS.Application.UseCases.Professionals.Update;
 using SGHSS.Application.UseCases.ProfessionalSchedules.Consult;
 using SGHSS.Domain.Enums;
 
@@ -23,6 +24,8 @@ namespace SGHSS.Interface.Controllers
         private readonly RegisterProfessionalUseCase _registerProfessionalUseCase;
         private readonly GetAllProfessionalsUseCase _getAllProfessionalsUseCase;
         private readonly GenerateAvailableSlotsUseCase _generateAvailableSlotsUseCase;
+        private readonly UpdateProfessionalSchedulePolicyUseCase _updateProfessionalSchedulePolicyUseCase;
+        private readonly ConsultReservedScheduleSlotsUseCase _consultReservedScheduleSlotsUseCase;
 
         /// <summary>
         /// Cria uma nova instância do controlador de profissionais.
@@ -31,12 +34,16 @@ namespace SGHSS.Interface.Controllers
             RegisterProfessionalUseCase registerProfessionalUseCase,
             GetAllProfessionalsUseCase getAllProfessionalsUseCase,
             GenerateAvailableSlotsUseCase generateAvailableSlotsUseCase,
-            RegisterLogActivityUseCase registerLogActivityUseCase)
+            UpdateProfessionalSchedulePolicyUseCase updateProfessionalSchedulePolicyUseCase,
+            RegisterLogActivityUseCase registerLogActivityUseCase,
+            ConsultReservedScheduleSlotsUseCase consultReservedScheduleSlotsUseCase)
             : base(registerLogActivityUseCase)
         {
             _registerProfessionalUseCase = registerProfessionalUseCase;
             _getAllProfessionalsUseCase = getAllProfessionalsUseCase;
             _generateAvailableSlotsUseCase = generateAvailableSlotsUseCase;
+            _updateProfessionalSchedulePolicyUseCase = updateProfessionalSchedulePolicyUseCase;
+            _consultReservedScheduleSlotsUseCase = consultReservedScheduleSlotsUseCase;
         }
 
         /// <summary>
@@ -224,5 +231,219 @@ namespace SGHSS.Interface.Controllers
                     healthUnitId: null);
             }
         }
+
+        /// <summary>
+        /// Atualiza a política de agendamento associada a um profissional.
+        /// </summary>
+        /// <remarks>
+        /// Apenas o próprio profissional (AccessLevel.Professional) pode alterar
+        /// a sua própria política de agenda.
+        /// </remarks>
+        /// <param name="professionalId">
+        /// Identificador do profissional cuja política de agenda será atualizada.
+        /// </param>
+        /// <param name="request">
+        /// Dados contendo o identificador do profissional e a nova política de agenda.
+        /// </param>
+        /// <returns>
+        /// Um <see cref="UpdateProfessionalSchedulePolicyResponse"/> contendo o identificador
+        /// do profissional e a política de agenda atualmente configurada.
+        /// </returns>
+        [HttpPut("{professionalId:guid}/schedule-policy")]
+        [Authorize]
+        [ProducesResponseType(typeof(UpdateProfessionalSchedulePolicyResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<ActionResult<UpdateProfessionalSchedulePolicyResponse>> UpdateSchedulePolicy(
+            Guid professionalId,
+            [FromBody] UpdateProfessionalSchedulePolicyRequest request)
+        {
+            // Somente para profissionais
+            var accessLevelClaim = User.FindFirst("access_level")?.Value;
+
+            if (!Enum.TryParse(accessLevelClaim, out AccessLevel userAccessLevel) ||
+                userAccessLevel != AccessLevel.Professional)
+            {
+                return Forbid();
+            }
+
+            // Verifica se o ID do token é o mesmo do profissional da rota
+            var userId = GetUserId();
+            if (!userId.HasValue || userId.Value != professionalId)
+            {
+                return Forbid();
+            }
+
+            // Consistência entre rota e corpo da requisição
+            if (request is null || request.ProfessionalId == Guid.Empty || request.ProfessionalId != professionalId)
+            {
+                return BadRequest(new
+                {
+                    error = "O identificador do profissional na rota não corresponde ao informado no corpo da requisição."
+                });
+            }
+
+            LogResult logResult = LogResult.Success;
+            string logDescription = "Política de agenda do profissional atualizada com sucesso.";
+
+            try
+            {
+                var response = await _updateProfessionalSchedulePolicyUseCase.Handle(request);
+                return Ok(response);
+            }
+            catch (ArgumentNullException ex)
+            {
+                logResult = LogResult.Failure;
+                logDescription = $"Falha ao atualizar política de agenda: {ex.Message}";
+
+                return BadRequest(new
+                {
+                    error = ex.Message
+                });
+            }
+            catch (ArgumentException ex)
+            {
+                logResult = LogResult.Failure;
+                logDescription = $"Falha ao atualizar política de agenda: {ex.Message}";
+
+                return BadRequest(new
+                {
+                    error = ex.Message
+                });
+            }
+            catch (InvalidOperationException ex)
+            {
+                logResult = LogResult.Failure;
+                logDescription = $"Falha ao atualizar política de agenda: {ex.Message}";
+
+                return BadRequest(new
+                {
+                    error = ex.Message
+                });
+            }
+            catch (Exception)
+            {
+                logResult = LogResult.Failure;
+                logDescription = "Erro inesperado ao atualizar política de agenda.";
+                throw;
+            }
+            finally
+            {
+                await RegistrarLogAsync(
+                    userId,
+                    action: "Professionals.UpdateSchedulePolicy",
+                    description: logDescription,
+                    result: logResult,
+                    healthUnitId: null
+                );
+            }
+        }
+
+        /// <summary>
+        /// Consulta todos os horários reservados de uma agenda profissional específica.
+        /// </summary>
+        /// <remarks>
+        /// Apenas o próprio profissional (AccessLevel.Professional) pode consultar
+        /// os horários reservados de sua agenda.
+        /// </remarks>
+        /// <param name="professionalId">
+        /// Identificador do profissional dono da agenda consultada.
+        /// </param>
+        /// <param name="request">
+        /// Dados contendo o identificador da agenda profissional.
+        /// </param>
+        /// <returns>
+        /// Um <see cref="ConsultReservedScheduleSlotResponse"/> contendo o identificador
+        /// da agenda e a coleção de horários reservados.
+        /// </returns>
+        [HttpPost("{professionalId:guid}/schedules/reserved")]
+        [Authorize]
+        [ProducesResponseType(typeof(ConsultReservedScheduleSlotResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<ActionResult<ConsultReservedScheduleSlotResponse>> ConsultReservedScheduleSlots(
+            Guid professionalId,
+            [FromBody] ConsultReservedScheduleSlotsRequest request)
+        {
+            var userId = GetUserId();
+            var accessLevel = GetUserAccessLevel();
+
+            // 🔒 Apenas profissionais autenticados
+            if (accessLevel is null || accessLevel.Value != AccessLevel.Professional)
+            {
+                return Forbid();
+            }
+
+            // 🔒 Apenas o próprio dono da agenda
+            if (!userId.HasValue || userId.Value != professionalId)
+            {
+                return Forbid();
+            }
+
+            // 🔒 Validação básica de consistência do corpo
+            if (request is null || request.ProfessionalScheduleId == Guid.Empty)
+            {
+                return BadRequest(new
+                {
+                    error = "O identificador da agenda profissional não pode ser vazio."
+                });
+            }
+
+            LogResult logResult = LogResult.Success;
+            string logDescription = "Consulta de horários reservados realizada com sucesso.";
+
+            try
+            {
+                var response = await _consultReservedScheduleSlotsUseCase.Handle(request);
+                return Ok(response);
+            }
+            catch (ArgumentNullException ex)
+            {
+                logResult = LogResult.Failure;
+                logDescription = $"Falha ao consultar horários reservados: {ex.Message}";
+
+                return BadRequest(new
+                {
+                    error = ex.Message
+                });
+            }
+            catch (ArgumentException ex)
+            {
+                logResult = LogResult.Failure;
+                logDescription = $"Falha ao consultar horários reservados: {ex.Message}";
+
+                return BadRequest(new
+                {
+                    error = ex.Message
+                });
+            }
+            catch (InvalidOperationException ex)
+            {
+                logResult = LogResult.Failure;
+                logDescription = $"Falha ao consultar horários reservados: {ex.Message}";
+
+                return BadRequest(new
+                {
+                    error = ex.Message
+                });
+            }
+            catch (Exception)
+            {
+                logResult = LogResult.Failure;
+                logDescription = "Erro inesperado ao consultar horários reservados.";
+                throw;
+            }
+            finally
+            {
+                await RegistrarLogAsync(
+                    userId,
+                    action: "Professionals.ConsultReservedScheduleSlots",
+                    description: logDescription,
+                    result: logResult,
+                    healthUnitId: null
+                );
+            }
+        }
+
     }
 }
