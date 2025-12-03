@@ -292,7 +292,7 @@ Responsável pela **implementação concreta** das interfaces da camada Application
 
 ### Pré-requisitos
 
-- **.NET SDK 10.0** (ou versão correspondente ao `TargetFramework` do projeto).
+- **.NET SDK 10.0**
 - Banco de dados relacional compatível com o provedor configurado (por ex. SQL Server / PostgreSQL).
 - Ferramentas recomendadas:
   - Visual Studio / Rider / VS Code + extensão C#,
@@ -304,4 +304,3 @@ Responsável pela **implementação concreta** das interfaces da camada Application
 
    ```bash
    git clone <https://github.com/TheTheqs/SGHSS>
-   cd SGHSS

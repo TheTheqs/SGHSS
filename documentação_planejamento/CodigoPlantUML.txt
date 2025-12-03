@@ -1,0 +1,295 @@
+@startuml
+hide circle
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+' ===== Consentimento =====
+enum EscopoConsentimento {
+  TRATAMENTO
+  NOTIFICACAO
+  PESQUISA
+}
+
+enum CanalConsentimento {
+  WEB
+  APP
+  BALCAO
+}
+
+enum StatusConsentimento {
+  ATIVO
+  REVOGADO
+}
+
+class Consentimento {
+  +id: UUID
+  +escopo: EscopoConsentimento
+  +versaoTermo: string
+  +canal: CanalConsentimento
+  +concedidoEm: datetime
+  +revogadoEm: datetime   ' null se ainda ativo
+  +status: StatusConsentimento
+  +hashTermoAssinado: string
+}
+
+' ===== Entidades Principais =====
+
+abstract class Usuario {
+  +id: UUID
+  +nome: string
+  +email: string
+  +telefone: string
+  +status: enum {ATIVO, INATIVO}
+  +obterConsentimentoAtivo(escopo: EscopoConsentimento): Consentimento?
+}
+
+class Paciente {
+  +cpf: string
+  +dataNascimento: date
+  +sexo: enum {M,F,O}
+  +endereco: string
+  +contatosEmergencia: string
+}
+
+class Profissional {
+  +registroConselho: string
+  +especialidade: string
+  +disponibilidade: enum {DISPONIVEL, INDISPONIVEL}
+}
+
+class Administrador {
+  +nivel: enum {BASICO, GESTOR, SUPER}
+}
+
+
+class UnidadeSaude {
+  +id: UUID
+  +nome: string
+  +cnpj: string
+  +endereco: string
+  +tipo: enum {HOSPITAL, CLINICA, LABORATORIO}
+}
+
+
+Usuario <|-- Paciente
+Usuario <|-- Profissional
+Usuario <|-- Administrador
+
+UnidadeSaude "1" o-- "0..*" Profissional : lota
+UnidadeSaude "1" o-- "0..*" Paciente : atende
+Usuario "1" 0-- "0..*" Consentimento: possui >
+
+' ========= Agenda e Consultas =========
+class AgendaProfissional {
+  +id: UUID
+}
+
+class PoliticaHorario {
+  +id: UUID
+  +duracaoMinutos: int
+  +timezone: string
+}
+
+class JanelaSemanal {
+  +id: UUID
+  +dia: enum {SEG, TER, QUA, QUI, SEX, SAB, DOM}
+  +inicio: time
+  +fim: time
+}
+
+class AgendaSlot {
+  +id: UUID
+  +inicio: datetime
+  +fim: datetime
+  +status: enum {LIVRE,RESERVADO,BLOQUEADO}
+}
+
+class Consulta {
+  +id: UUID
+  +dataHora: datetime
+  +status: enum {SOLICITADA, NEGADA, AGENDADA,CANCELADA,REALIZADA,NÃO_COMPARECEU}
+  +tipo: enum {PRESENCIAL, TELECONSULTA}
+  +linkTeleconsulta: string
+  +motivo: string
+}
+
+Profissional "1" o-- "1" AgendaProfissional
+AgendaProfissional "1" *-- "0..*" AgendaSlot
+AgendaProfissional "1" --> "1" PoliticaHorario : segue >
+PoliticaHorario "1" *-- "1..*" JanelaSemanal : define >
+Paciente "1" o-- "0..*" Consulta
+Profissional "1" o-- "0..*" Consulta
+UnidadeSaude "1" o-- "0..*" Consulta
+Consulta "0..1" --> "1" AgendaSlot : reserva
+
+' ========= Prontuário e Histórico =========
+class Prontuario {
+  +id: UUID
+  +numero: string
+  +criadoEm: datetime
+}
+
+class AtualizacaoProntuario {
+  +id: UUID
+  +dataHora: datetime
+  +descricao: string
+  +tipo: enum {ANAMNESE, EVOLUCAO, EXAME, RESULTADO, OUTRO}
+}
+
+Paciente "1" 0-- "1" Prontuario
+Prontuario "1" *-- "0..*" AtualizacaoProntuario
+
+AtualizacaoProntuario "1" --> Prontuario
+AtualizacaoProntuario "1" --> Profissional
+AtualizacaoProntuario "1" --> UnidadeSaude
+AtualizacaoProntuario "0..1" --> "1" Consulta: se aplicável
+
+
+' ========= Documentos clínicos =========
+class ReceitaDigital {
+  +id: UUID
+  +conteudo: text
+  +assinaturaICP: string
+  +dataHora: datetime
+}
+class AtestadoDigital {
+  +id: UUID
+  +conteudo: text
+  +assinaturaICP: string
+  +dataHora: datetime
+}
+
+Consulta "1" *-- "0..*" ReceitaDigital
+Consulta "1" *-- "0..*" AtestadoDigital
+ReceitaDigital "1" --> "1" Paciente
+AtestadoDigital "1" --> "1" Paciente
+ReceitaDigital "1" --> "1" Profissional
+AtestadoDigital "1" --> "1" Profissional
+
+UnidadeSaude "1" 0-- "0..*" ReceitaDigital
+UnidadeSaude "1" 0-- "0..*" AtestadoDigital
+
+' ========= Notificações =========
+class Notificacao {
+  +id: UUID
+  +canal: enum {EMAIL,SMS,APP}
+  +mensagem: string
+  +agendadaPara: datetime
+  +status: enum {PENDENTE,ENVIADA,FALHA, VISUALIZADA}
+}
+Notificacao "0..*" --> "0..1" Consulta : lembra
+Notificacao "0..*" --> "1" Usuario : destinatário
+
+' ========= Internações e leitos =========
+class Internacao {
+  +id: UUID
+  +dataEntrada: datetime
+  +dataAlta: datetime
+  +motivo: string
+  +status: enum {ATIVA, ALTA, TRANSFERIDA}
+}
+class Leito {
+  +id: UUID
+  +codigo: string
+  +tipo: enum {ENFERMARIA,APARTAMENTO,UTI}
+  +status: enum {DISPONIVEL,OCUPADO,MANUTENCAO,RESERVADO}
+}
+
+UnidadeSaude "1" o-- "0..*" Leito
+Paciente "1" o-- "0..*" Internacao
+Leito "1" o-- "0..*" Internacao
+
+' ========= Home Care =========
+class AcompanhamentoDomiciliar {
+  +id: UUID
+  +dataHora: datetime
+  +descricao: text
+}
+Paciente "1" o-- "0..*" AcompanhamentoDomiciliar
+Profissional "1" o-- "0..*" AcompanhamentoDomiciliar
+UnidadeSaude "1" o-- "0..*" AcompanhamentoDomiciliar
+
+' ========= Suprimentos / Estoque =========
+class Produto {
+  +id: UUID
+  +nome: string
+  +categoria: string
+  +unidadeMedida: string
+  +estoqueMinimo: int
+}
+class MovimentoEstoque {
+  +id: UUID
+  +tipo: enum {ENTRADA,SAIDA,AJUSTE}
+  +quantidade: decimal
+  +dataHora: datetime
+  +observacao: string
+}
+UnidadeSaude "1" o-- "0..*" Produto
+Produto "1" *-- "0..*" MovimentoEstoque
+Administrador "1" o-- "0..*" MovimentoEstoque
+
+' ========= Auditoria e LGPD =========
+class LogAtividade {
+  +id: UUID
+  +timestamp: datetime
+  +acao: string
+  +recurso: string      'ex.: /pacientes/123
+  +ip: string
+  +resultado: enum {OK,NEGADO,ERRO}
+}
+Usuario "1" o-- "0..*" LogAtividade
+UnidadeSaude "1" o-- "0..*" LogAtividade
+
+' ========= Relatórios (read-models) =========
+class RelatorioAuditoria <<read-model>> {
+  +periodo: string
+  +escopo: string
+}
+RelatorioAuditoria ..> LogAtividade
+
+class RelatorioFinanceiro <<read-model>> {
+  +periodo: string
+  +escopo: string
+}
+RelatorioFinanceiro ..> MovimentoEstoque
+
+' ========= Regras e observações =========
+note top of AgendaProfissional
+RF007: gerenciamento de agendas
+1–1 com Profissional por padrão.
+Slots detalham disponibilidade.
+end note
+
+note top of Consulta
+RF003: agendar/cancelar/acompanhar
+RF005: teleconsulta (tipo/link)
+end note
+
+note top of Prontuario
+RF008: atualização por profissional
+RF010: acesso por profissional
+LGPD: consentimento
+end note
+
+note top of ReceitaDigital
+RF009: receitas/atestados digitais
+Assinatura eletrônica (ICP)
+end note
+
+note top of Internacao
+RF012: internações e leitos
+end note
+
+note top of Produto
+RF013: controle de estoque
+end note
+
+note top of LogAtividade
+RF016 e RF018: logs/auditoria
+RNF006: retenção >= 5 anos
+end note
+
+note "RNF003: múltiplas unidades\n→ relacionamentos com UnidadeSaude" as N1
+N1 .. UnidadeSaude
+
+@enduml

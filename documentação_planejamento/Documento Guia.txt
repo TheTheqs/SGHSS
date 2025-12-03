@@ -1,0 +1,45 @@
+Projeto SGHSS - Sistema de Gestão Hospitalar e Serviços de Saúde.
+
+Ênfase: Backend
+Descrição: Desenvolvimento de uma API REST capaz de realizar operações de leitura e escrita sobre as entidades do sistema.
+Escopo e proposta:
+	[texto adaptado do roteiro da atividade]
+	A instituição VidaPlus administra hospitais, clínicas de bairro, laboratórios e equipes de home care. Ela necessita de um Sistema de Gestão Hospitalar e de Serviços de Saúde (SGHSS) para centralizar:
+	1- Cadastro e Atendimento de Pacientes: consultas, exames, prontuários e telemedicina.
+	2- Gestão de Profissionais de Saúde: médicos, enfermeiros, técnicos, agendas e prescrições.
+	3- Administração Hospitalar: controle de leitos, relatórios financeiros e suprimentos.
+	4- Telemedicina: atendimentos e prescrições online, marcação de consultas e exames.
+	5- Segurança e Compliance: controle de acesso, LGPD e registros de auditoria.
+
+Escolhas de Design:
+	Optou-se por uma arquitetura em camadas, dividas da seguinte maneira:
+	
+	1- Interface
+	Camada de exposição de endpoints (controllers).
+	Também contém as classes de estrutura de formulários (RequestDTO) e de resposta ao usuário (ResponseDTO).
+	Inclui o componente responsável por tratar e padronizar mensagens de erro, convertendo exceções em respostas HTTP com códigos e mensagens descritivas.
+
+	2- Aplicação(Application)
+	Camada de serviço e orquestração de regras de negócio.
+	Contém as classes responsáveis pelos casos de uso (Use Cases), além da lógica interna necessária para execução de operações como agendamento de consultas, validações e autenticações.
+	É o ponto central de interação entre as camadas Interface, Domínio e Infraestrutura.
+
+	3- Domínio(Domain)
+	Camada que define a estrutura conceitual do sistema, incluindo entidades, value objects e regras invariantes de negócio.
+	Aqui não há dependência de frameworks ou tecnologias externas.
+
+	4- Infraestrutura(Infrastructure)
+	Camada responsável pela implementação técnica dos serviços e integrações.
+	Abriga:
+		Banco de dados e mapeamentos;
+		Serviços externos e APIs;
+		Sistema de logs e autenticação;
+		Adapters (implementações concretas de interfaces/ports);
+		Tratamento global de exceções;
+		Configurações gerais e documentação (Swagger, migrations etc.).
+
+Ecossistema e Ferramentas:
+	Plataforma: .NET / ASP.NET Core
+	Testes: TDD
+	Versionamento: repositório público via GitHub, disponível em: 
+	Metodologia: Scrum Agile, com acompanhamento de Sprints. Planejamento disponível em: https://trello.com/b/7qIyCVg0/trabalho-final-faculdade

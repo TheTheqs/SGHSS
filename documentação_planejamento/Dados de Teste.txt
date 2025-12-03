@@ -1,0 +1,64 @@
+|ADM SUPER|
+NOME: Administrador Padrão SGHSS
+EMAIL: super.admin@sghss.local
+SENHA: Admin12345
+TELEFONE: 11987654321
+ID: 82ca06de-6130-437e-8f58-778996ed1507
+
+
+|ADM COMUM|
+NOME: Administrador Comum SGHSS"
+EMAIL: comum.admin@sghss.local
+SENHA: Comum12345
+TELEFONE 11988437612
+ID: 651f38d4-602a-446a-8fd2-015563a9d9d0
+
+|PATIENT|
+NOME: Paciente Exemplo"
+EMAIL: exemple.patient@sghss.local
+SENHA: Patient12345
+TELEFONE: 11988437612
+NASCIMENTO: 1995-11-28T08:05:25.527Z
+CPF: 52998224725
+SEX: 0
+ID: 9f6055f4-e38f-4063-8e69-78c5f3cea010
+
+|PROFESSIONAL|
+NOME: Profissional Exemplo
+EMAIL: exemple.professional@sgss.local
+SENHA: Professional12345
+TELEFONE: 11987654321
+LICENÇA: CRM-RJ 987654
+ESPECIALIDADE: Médico Geral
+TIMEZONE: America/Sao_Paulo
+ID: d821d98f-bb1c-4fd3-9b53-b23a0f635aa6
+
+|HEALTH UNIT|
+NOME: Clínica Eexemplo
+CNPJ: 43815357000104
+TELEFONE: 11987654321
+TIPO: 2
+ID: 99f138e6-60cc-4eb9-a0d5-38f6a32dc228
+
+
+|HashDigests Válidos|
+a3f91c2e4bd7f90816cbf3d2a8c9e01b4f7e2a6cc5d912e0bcf8a32dd0f4b27
+
+c4e8ab1190d43fef8d26aa71f2b44ca0e3d19fe334adbc07e9fd841a99df6e3b
+
+|Consents formatados para preenchimento no Swagger|
+    {
+      "scope": 0,
+      "termVersion": "Termo de Tratamento de Dados",
+      "channel": 0,
+      "consentDate": "2025-11-28T07:19:44.301Z",
+      "revocationDate": null,
+      "termHash": "a3f91c2e4bd7f90816cbf3d2a8c9e01b4f7e2a6cc5d912e0bcf8a32dd0f4b270"
+    },
+        {
+      "scope": 2,
+      "termVersion": "Termo para receber notificações",
+      "channel": 0,
+      "consentDate": "2025-11-28T07:19:44.301Z",
+      "revocationDate": null,
+      "termHash": "c4e8ab1190d43fef8d26aa71f2b44ca0e3d19fe334adbc07e9fd841a99df6e3b"
