@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using SGHSS.Application.UseCases.Administrators.Update;
 using SGHSS.Application.UseCases.Common;
 using SGHSS.Application.UseCases.LogActivities.Register;
+using SGHSS.Application.UseCases.Patients.ConsultMedicalRecord;
 using SGHSS.Application.UseCases.Patients.Read;
 using SGHSS.Application.UseCases.Patients.Register;
 using SGHSS.Domain.Enums;
@@ -24,6 +25,7 @@ namespace SGHSS.Interface.Controllers
         private readonly GetAllPatientsUseCase _getAllPatientsUseCase;
         private readonly HospitalizePatientUseCase _hospitalizePatientUseCase;
         private readonly DischargePatientUseCase _dischargePatientUseCase;
+        private readonly ConsultMedicalRecordUseCase _consultMedicalRecordUseCase;
 
         /// <summary>
         /// Instancia um novo controlador de pacientes,
@@ -34,6 +36,7 @@ namespace SGHSS.Interface.Controllers
             GetAllPatientsUseCase getAllPatientsUseCase,
             HospitalizePatientUseCase hospitalizePatientUseCase,
             DischargePatientUseCase dischargePatientUseCase,
+            ConsultMedicalRecordUseCase consultMedicalRecordUseCase,
             RegisterLogActivityUseCase registerLogActivityUseCase)
             : base(registerLogActivityUseCase)
         {
@@ -41,6 +44,7 @@ namespace SGHSS.Interface.Controllers
             _getAllPatientsUseCase = getAllPatientsUseCase;
             _hospitalizePatientUseCase = hospitalizePatientUseCase;
             _dischargePatientUseCase = dischargePatientUseCase;
+            _consultMedicalRecordUseCase = consultMedicalRecordUseCase;
         }
 
         /// <summary>
@@ -273,6 +277,92 @@ namespace SGHSS.Interface.Controllers
                 await RegistrarLogAsync(
                     userId,
                     action: "Patients.Discharge",
+                    description: logDescription,
+                    result: logResult,
+                    healthUnitId: null
+                );
+            }
+        }
+
+        /// <summary>
+        /// Consulta o prontuário eletrônico de um paciente específico.
+        /// </summary>
+        /// <param name="patientId">
+        /// Identificador do paciente cujo prontuário será consultado.
+        /// </param>
+        /// <returns>
+        /// Um <see cref="ConsultMedicalRecordResponse"/> contendo o prontuário
+        /// e o histórico de atualizações.
+        /// </returns>
+        [HttpGet("{patientId:guid}/medical-record")]
+        [Authorize]
+        [ProducesResponseType(typeof(ConsultMedicalRecordResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<ConsultMedicalRecordResponse>> ConsultMedicalRecord(Guid patientId)
+        {
+            var userId = GetUserId();
+            var accessLevel = GetUserAccessLevel();
+
+            // Sem nível de acesso válido
+            if (accessLevel is null || accessLevel.Value < AccessLevel.Patient)
+                return Forbid();
+
+            // Se for exatamente Patient, só pode consultar o próprio prontuário
+            if (HasExactAccessLevel(AccessLevel.Patient))
+            {
+                if (!userId.HasValue || userId.Value != patientId)
+                {
+                    return Forbid();
+                }
+            }
+
+            LogResult logResult = LogResult.Success;
+            string logDescription = "Consulta de prontuário realizada com sucesso.";
+
+            try
+            {
+                var request = new ConsultMedicalRecordRequest
+                {
+                    PatientId = patientId
+                };
+
+                var response = await _consultMedicalRecordUseCase.Handle(request);
+                return Ok(response);
+            }
+            catch (ArgumentException ex)
+            {
+                logResult = LogResult.Failure;
+                logDescription = $"Falha ao consultar prontuário: {ex.Message}";
+
+                return BadRequest(new
+                {
+                    error = ex.Message
+                });
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Paciente não encontrado OU sem prontuário associado.
+                logResult = LogResult.Failure;
+                logDescription = $"Falha ao consultar prontuário: {ex.Message}";
+
+                return NotFound(new
+                {
+                    error = ex.Message
+                });
+            }
+            catch (Exception)
+            {
+                logResult = LogResult.Failure;
+                logDescription = "Erro inesperado ao consultar prontuário.";
+                throw;
+            }
+            finally
+            {
+                await RegistrarLogAsync(
+                    userId,
+                    action: "Patients.ConsultMedicalRecord",
                     description: logDescription,
                     result: logResult,
                     healthUnitId: null

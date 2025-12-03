@@ -48,6 +48,13 @@ namespace SGHSS.Infra.Repositories
                     .ThenInclude(h => h.Bed)
                 .Include(p => p.MedicalRecord)
                     .ThenInclude(mr => mr.Updates)
+                        .ThenInclude(u => u.Professional)
+                .Include(p => p.MedicalRecord)
+                    .ThenInclude(mr => mr.Updates)
+                        .ThenInclude(u => u.HealthUnit)
+                .Include(p => p.MedicalRecord)
+                    .ThenInclude(mr => mr.Updates)
+                        .ThenInclude(u => u.Appointment)
                 .FirstOrDefaultAsync(p => p.Id == patientId);
         }
 

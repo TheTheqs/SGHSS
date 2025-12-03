@@ -164,12 +164,12 @@ namespace SGHSS.Interface.Controllers
             var accessLevel = GetUserAccessLevel();
             var userId = GetUserId();
 
-            // Sem nível de acesso válido → acesso negado
+            // Sem nível de acesso válido
             if (accessLevel is null || accessLevel.Value < AccessLevel.Patient)
                 return Forbid();
 
             // Se for exatamente Patient, só pode consultar o próprio histórico
-            if (accessLevel.Value == AccessLevel.Patient)
+            if (HasExactAccessLevel(AccessLevel.Patient))
             {
                 if (!userId.HasValue || userId.Value != patientId)
                 {

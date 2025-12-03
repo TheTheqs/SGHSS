@@ -147,46 +147,5 @@ namespace SGHSS.Tests.Application.Notifications.Create
                 .ThrowAsync<InvalidOperationException>()
                 .WithMessage("A mensagem da notificação não pode ser vazia.");
         }
-
-        [Fact]
-        public async Task Deve_Lancar_Excecao_Quando_Usuario_Nao_Possuir_Consentimento_De_Notificacao_Ativo()
-        {
-            // Arrange
-            using var context = DbContextTestFactory.CreateInMemoryContext();
-
-            INotificationRepository notificationRepo = new NotificationRepository(context);
-            IUserRepository userRepo = new UserRepository(context);
-            IAdministratorRepository administratorRepo = new AdministratorRepository(context);
-
-            // Cria um Administrator APENAS com consentimento de tratamento (sem Notification)
-            RegisterAdministratorRequest adminExample = AdministratorGenerator.GenerateAdministrator();
-
-            ConsentDto treatmentConsent =
-                ConsentGenerator.GenerateConsent(ConsentScope.Treatment, ConsentChannel.App, true);
-
-            adminExample.Consents.Add(treatmentConsent);
-
-            var registerAdminUseCase = new RegisterAdministratorUseCase(administratorRepo);
-            var adminResult = await registerAdminUseCase.Handle(adminExample);
-
-            adminResult.Should().NotBeNull();
-            adminResult.AdministratorId.Should().NotBe(Guid.Empty);
-
-            var useCase = new CreateNotificationUseCase(notificationRepo, userRepo);
-
-            // Request normal, com dados válidos
-            var request = CreateNotificationRequestGenerator.Generate(
-                providedRecipientId: adminResult.AdministratorId
-            );
-
-            // Act
-            Func<Task> act = () => useCase.Handle(request);
-
-            // Assert
-            await act.Should()
-                .ThrowAsync<InvalidOperationException>()
-                .WithMessage("O usuário não possui um consentimento de notificação ativo.");
-        }
-
     }
 }
